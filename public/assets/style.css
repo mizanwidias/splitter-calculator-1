@@ -1,0 +1,26 @@
+body {
+    background-color: #fff;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+.green-box {
+    background-color: #43724c;
+    color: white;
+    border-radius: 1rem;
+    padding: 2rem;
+}
+.form-label {
+    font-weight: 600;
+}
+.form-control:focus,
+.form-select:focus {
+    box-shadow: 0 0 0 0.2rem rgba(67, 114, 76, 0.25);
+}
+.range-value {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.9rem;
+}
+.btn-dark {
+    background-color: #111;
+    border: none;
+}
