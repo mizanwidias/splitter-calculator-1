@@ -47,7 +47,7 @@
             <a href="{{ route('home') }}" class="logo d-flex align-items-center me-auto">
                 <!-- Uncomment the line below if you also wish to use an image logo -->
                 <img src="{{ asset('fe/img/hyp-set.png') }}" alt="">
-                <h1 class="sitename">Hyperlink</h1>
+                <h1 class="sitename">Hyperlink Calculator</h1>
             </a>
 
             <nav id="navmenu" class="navmenu">
