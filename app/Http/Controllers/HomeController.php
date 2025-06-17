@@ -4,15 +4,15 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 
-class LossCalculatorController extends Controller
+class HomeController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
-        return view('loss_calculator.index', [
-            'title' => 'Splitter Loss Calculator',
+        return view('home.index', [
+            'title' => 'Hyperlink'
         ]);
     }
 

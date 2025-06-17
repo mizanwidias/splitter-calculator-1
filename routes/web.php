@@ -16,7 +16,8 @@ use App\Http\Controllers\LossCalculatorController;
 */
 
 Route::get('/', function () {
-    return view('welcome');
+    return redirect()->route('home');
 });
 
-Route::resource('/loss_calculator', \App\Http\Controllers\LossCalculatorController::class)->name('index', 'loss_calculator');
+
+Route::resource('/home', \App\Http\Controllers\HomeController::class)->name('index', 'home');

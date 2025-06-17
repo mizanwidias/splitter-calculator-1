@@ -2,12 +2,27 @@ body {
     background-color: #fff;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
+@keyframes float {
+    0% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-10px);
+    }
+    100% {
+        transform: translateY(0);
+    }
+}
+
 .green-box {
-    background-color: #43724c;
+    background-color: #10BC69;
     color: white;
     border-radius: 1rem;
     padding: 2rem;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+    animation: float 2s ease-in-out infinite;
 }
+
 .form-label {
     font-weight: 600;
 }
