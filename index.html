@@ -54,11 +54,12 @@
                                     >+/-</span
                                 >
                                 <input
-                                    type="number"
+                                    type="text"
+                                    inputmode="decimal"
+                                    pattern="^-?\d*\.?\d*$"
                                     class="form-control"
                                     id="inputLoss"
                                     placeholder="7.00"
-                                    step="any"
                                 />
                             </div>
                         </div>
@@ -247,11 +248,11 @@
                 const statusElement = document.getElementById("statusText");
                 resultElement.textContent = `${total.toFixed(2)} dB`;
                 if (total <= -28.0) {
-                    statusElement.textContent = "Connection Lost";
+                    statusElement.textContent = "Connection Too Low";
                     statusElement.classList.remove("text-warning");
                     statusElement.classList.add("text-danger");
                 } else {
-                    statusElement.textContent = "Connection Success";
+                    statusElement.textContent = "Connection Good";
                     statusElement.classList.remove("text-danger");
                     statusElement.classList.add("text-warning");
                 }
