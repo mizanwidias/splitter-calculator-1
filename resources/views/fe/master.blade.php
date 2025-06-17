@@ -100,7 +100,7 @@
                             <a href="{{ route('home') }}" class="btn-get-started">Get Started</a>
                             <a href="https://www.youtube.com/watch?v=6Ioe_g3hJHc"
                                 class="glightbox btn-watch-video d-flex align-items-center"><i
-                                    class="bi bi-play-circle"></i><span>Watch Video</span></a>
+                                    class="bi bi-play-circle"></i><span>Tonton Ini</span></a>
                         </div>
                     </div>
                     <div class="col-lg-6 order-1 order-lg-2 hero-img" data-aos="zoom-out" data-aos-delay="100">
