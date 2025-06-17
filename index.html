@@ -50,12 +50,35 @@
                                 >Input Loss (dB)</label
                             >
                             <div class="input-group">
-                                <span class="input-group-text fw-bold"
-                                    >+/-</span
+                                <button
+                                    class="btn btn-outline-secondary dropdown-toggle fw-bold"
+                                    type="button"
+                                    data-bs-toggle="dropdown"
+                                    aria-expanded="false"
+                                    id="plusMinusBtn"
                                 >
+                                    +/-
+                                </button>
+                                <ul class="dropdown-menu">
+                                    <li>
+                                        <a
+                                            class="dropdown-item"
+                                            href="#"
+                                            onclick="setSign('+')"
+                                            >+</a
+                                        >
+                                    </li>
+                                    <li>
+                                        <a
+                                            class="dropdown-item"
+                                            href="#"
+                                            onclick="setSign('-')"
+                                            >-</a
+                                        >
+                                    </li>
+                                </ul>
                                 <input
-                                    type="text"
-                                    inputmode="decimal"
+                                    type="number"
                                     class="form-control"
                                     id="inputLoss"
                                     placeholder="7.00"
@@ -281,6 +304,25 @@
                 input.addEventListener("input", () => sync(input.value));
                 sync(slider.value);
             });
+
+            function setSign(sign) {
+                const input = document.getElementById("inputLoss");
+                let val = parseFloat(input.value);
+
+                if (isNaN(val)) val = 0;
+
+                if (sign === "-") {
+                    input.value = -Math.abs(val);
+                } else {
+                    input.value = Math.abs(val);
+                }
+
+                // Ubah tulisan tombol +/-
+                document.getElementById("plusMinusBtn").textContent = sign;
+
+                calculateLoss();
+            }
         </script>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     </body>
 </html>
