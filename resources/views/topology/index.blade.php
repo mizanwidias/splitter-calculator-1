@@ -2,16 +2,36 @@
 @section('content')
     <div class="row">
         <div class="col-md-3">
-            <h5>Tambah Perangkat</h5>
+            <h1 class="mb-4 fw-bold">Splitter Loss Calculator</h1>
             <div class="mb-2">
-                <label>Power OLT (dBm)</label>
-                <input type="number" id="input-power" class="form-control form-control-sm" value="7">
+                <label for="inputLoss" class="form-label">Power OLT (dB)</label>
+                <div class="input-group">
+                    <button class="btn btn-outline-secondary dropdown-toggle fw-bold" type="button" data-bs-toggle="dropdown"
+                        aria-expanded="false" id="plusMinusBtn">
+                        +/-
+                    </button>
+                    <ul class="dropdown-menu">
+                        <li>
+                            <a class="dropdown-item" onclick="setSign('+')">+</a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item" onclick="setSign('-')">-</a>
+                        </li>
+                    </ul>
+                    <input type="number" class="form-control" id="inputLoss" placeholder="7.00" step="any" />
+                </div>
+                <div class="form-text">
+                    Isikan angka input loss (dB) terlebih dahulu, kemudian pilih tanda <span
+                        class="text-danger fw-bold">+</span> atau <span class="text-danger fw-bold">-</span>
+                </div>
             </div>
-            <button class="btn btn-sm mb-2 w-100 text-black fw-bold" style="background-color: #10BC69;" onclick="addNode('OLT')">+
+            <button class="btn btn-sm mb-2 w-100 text-black fw-bold" style="background-color: #10BC69;"
+                onclick="addNode('OLT')">+
                 OLT</button>
             <button class="btn btn-sm mb-2 w-100 text-black fw-bold" style="background-color: #10BC69;"
                 onclick="addNode('Splitter')">+ Splitter</button>
-            <button class="btn btn-sm mb-2 w-100 text-black fw-bold" style="background-color: #10BC69;" onclick="addNode('ODP')">+
+            <button class="btn btn-sm mb-2 w-100 text-black fw-bold" style="background-color: #10BC69;"
+                onclick="addNode('ODP')">+
                 ODP</button>
             <button class="btn btn-sm mb-2 w-100 text-black fw-bold" style="background-color: #10BC69;"
                 onclick="addNode('Client')">+ Client</button>
@@ -38,7 +58,8 @@
             <button class="btn btn-sm btn-secondary mb-2 w-100" onclick="connectNodes()">Sambungkan Node</button>
             <button class="btn btn-sm btn-danger mb-2 w-100" onclick="undoAction()">↩ Undo</button>
             <button class="btn btn-sm btn-warning mb-2 w-100" onclick="resetMap()">Reset</button>
-            <button class="btn btn-sm w-100 text-black fw-bold" style="background-color: #10BC69;" onclick="saveTopology()">Hitung Loss</button>
+            <button class="btn btn-sm w-100 text-black fw-bold" style="background-color: #10BC69;"
+                onclick="saveTopology()">Hitung Loss</button>
         </div>
 
         <div class="col-md-6 position-relative" id="map-canvas"
@@ -54,7 +75,7 @@
                 <p class="card-text">Jalur: <span id="jalur-text">-</span></p>
             </div>
         </div>
-    </div> --}}
+            </div> --}}
         <div class="col-md-3">
             <div class="green-box">
                 <h5 class="text-black">Informasi Loss</h5>
@@ -108,6 +129,7 @@
             </div>
         </div>
     </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 @endsection
 
 @push('scripts')

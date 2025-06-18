@@ -44,7 +44,9 @@ function calculateLoss() {
     const connectorLoss = parseFloat(document.getElementById("connectorLoss").value) || 0;
     const meter = parseFloat(document.getElementById("cableLength").value) || 0;
 
-    const cableLoss = 0.3 * (meter / 1000); // Rumus redaman kabel: 0.3 dB per km
+    const cableLossPerKm = parseFloat(document.getElementById("cableType").value) || 0.3;
+    const cableLoss = cableLossPerKm * (meter / 1000);
+    // Rumus redaman kabel: 0.3 dB per km
 
     // Hitung total redaman akhir
     const total = inputLoss - (cableLoss + spliceLoss + connectorLoss + splitterLoss);
@@ -70,6 +72,23 @@ function calculateLoss() {
         statusElement.className = "text-success fw-bold";
     }
 }
+
+document.getElementById("cableType").addEventListener("change", () => {
+    const val = document.getElementById("cableType").value;
+    const badge = document.getElementById("lossPerKmInfo");
+
+    badge.textContent = `${val} dB/km`;
+
+    // Ubah warna badge sesuai pilihan kabel
+    if (val === "0.3") {
+        badge.className = "badge bg-dark ms-2"; // Dropcore
+    } else if (val === "0.2") {
+        badge.className = "badge bg-warning text-dark ms-2"; // Patchcord
+    }
+
+    calculateLoss();
+});
+
 
 document.getElementById("cableLength").addEventListener("input", () => {
     const val = document.getElementById("cableLength").value;

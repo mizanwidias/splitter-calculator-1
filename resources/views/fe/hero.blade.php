@@ -5,7 +5,7 @@
                 <h1>Bingung Menghitung Redaman?</h1>
                 <p>Hitung Redaman Valid dan buat simulasi Io di sini</p>
                 <div class="d-flex">
-                    <a href="{{ route('topology') }}" class="btn-get-started">Get Started</a>
+                    <a href="{{ route('lab.create') }}" class="btn-get-started">Get Started</a>
                     <a href="https://www.youtube.com/watch?v=6Ioe_g3hJHc"
                         class="glightbox btn-watch-video d-flex align-items-center"><i
                             class="bi bi-play-circle"></i><span>Tonton Ini</span></a>

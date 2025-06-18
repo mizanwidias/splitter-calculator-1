@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Topology;
 use Illuminate\Http\Request;
 
 class TopologyController extends Controller
@@ -11,9 +12,7 @@ class TopologyController extends Controller
      */
     public function index()
     {
-        return view('topology.index', [
-            'title' => 'Hyperlink - FLS'
-        ]);
+        //
     }
 
     /**
@@ -35,7 +34,7 @@ class TopologyController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
+    public function show(Topology $topology)
     {
         //
     }
@@ -43,7 +42,7 @@ class TopologyController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(string $id)
+    public function edit(Topology $topology)
     {
         //
     }
@@ -51,7 +50,7 @@ class TopologyController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(Request $request, Topology $topology)
     {
         //
     }
@@ -59,7 +58,7 @@ class TopologyController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy(Topology $topology)
     {
         //
     }

@@ -1,6 +1,15 @@
-<section id="loss_calculator">
-    <div class="container py-5">
-        <h1 class="mb-4 fw-bold">Splitter Loss Calculator</h1>
+<section id="loss_calculator" class="loss_calculator section light-background">
+
+    <!-- Section Title -->
+    <div class="container section-title" data-aos="fade-up">
+        <span>Splitter Loss Calculator<br></span>
+        <h1 class="fw-bold">Splitter Loss Calculator</h1>
+        <p>Calculate the loss of a splitter using the formula.</p>
+    </div>
+    <!-- End Section Title -->
+
+    <div class="container" data-aos="fade-up" data-aos-delay="100">
+
         <div class="row">
             <!-- Left Side Form -->
             <div class="col-md-6">
@@ -46,6 +55,19 @@
                             Choose your splitter configuration
                         </div>
                     </div>
+
+                    <div class="mb-4">
+                        <label for="cableType" class="form-label">Cable Type</label>
+                        <select class="form-select" id="cableType">
+                            <option value="0.3" selected>Dropcore (0.3 dB/km)</option>
+                            <option value="0.2">Patchcord (0.2 dB/km)</option>
+                        </select>
+                        <div class="form-text">
+                            Select the type of fiber optic cable used.
+                            <span id="lossPerKmInfo" class="badge bg-dark ms-2">0.3 dB/km</span>
+                        </div>
+                    </div>
+
 
                     <div class="mb-4">
                         <label for="cableLength" class="form-label">
@@ -147,3 +169,4 @@
         </div>
     </div>
 </section>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>

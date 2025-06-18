@@ -2,6 +2,28 @@ body {
     background-color: #fff;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
+
+.avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.badge-online {
+    background: linear-gradient(87deg, #2dce89 0, #10BC69 100%);
+    color: white;
+}
+
+.badge-offline {
+    background: linear-gradient(87deg, #627594 0, #8898aa 100%);
+    color: white;
+}
+
+.card-rounded {
+    border-radius: 1rem;
+}
+
 @keyframes float {
     0% {
         transform: translateY(0);
@@ -20,6 +42,10 @@ body {
     border-radius: 1rem;
     padding: 2rem;
     box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+    animation: float 2s ease-in-out infinite;
+}
+
+.btn-move {
     animation: float 2s ease-in-out infinite;
 }
 

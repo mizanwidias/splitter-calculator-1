@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\LossCalculatorController;
+use App\Http\Controllers\LabController;
 
 
 /*
@@ -21,4 +22,5 @@ Route::get('/', function () {
 
 
 Route::resource('/home', \App\Http\Controllers\HomeController::class)->name('index', 'home');
-Route::resource('/topology', \App\Http\Controllers\TopologyController::class)->name('index', 'topology');
+Route::resource('/lab', \App\Http\Controllers\LabController::class)->name('index', 'lab');
+Route::get('/lab/{lab}/topologi', [LabController::class, 'topologi'])->name('lab.canvas');

@@ -10,8 +10,9 @@
 
     <!-- Favicons -->
     <link href="{{ asset('fe/img/hyp-tam.png') }}" rel="icon">
-    <link rel="stylesheet" href="{{ asset('assets/style.css') }}">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
 
     <!-- Fonts -->
     <link href="https://fonts.googleapis.com" rel="preconnect">
@@ -29,6 +30,8 @@
 
     <!-- Main CSS File -->
     <link href="{{ asset('fe/css/main.css') }}" rel="stylesheet">
+    <link href="{{ asset('assets/style.css') }}" rel="stylesheet">
+
 
     <!-- =======================================================
   * Template Name: eNno
@@ -72,9 +75,8 @@
                 </ul>
                 <i class="mobile-nav-toggle d-xl-none bi bi-list"></i>
             </nav>
-            <a href="{{ route('topology') }}"
-                class="btn-getstarted {{ request()->routeIs('topology') ? 'text-black border border-success bg-transparent' : '' }}">Fiber
-                Loss Simulator
+            <a href="{{ route('lab') }}"
+                class="btn-getstarted {{ request()->routeIs('lab') ? 'text-black border border-success bg-transparent' : '' }}">FSL
             </a>
         </div>
     </header>
@@ -122,28 +124,17 @@
             </div>
 
         </section><!-- /Featured Services Section --> --}}
-
+        @yield('content')
         <!-- About Section -->
-        <section id="calculator" class="about section">
-
-            {{-- <!-- Section Title -->
-            <div class="container section-title" data-aos="fade-up">
-                <span><br></span>
-                <h2>About</h2>
-                <p>Necessitatibus eius consequatur ex aliquid fuga eum quidem sint consectetur velit</p>
-            </div><!-- End Section Title --> --}}
-
+        <section id="content.create" class="content section">
             <div class="container">
-
                 <div class="row gy-4">
-                    @yield('loss_calculator')
-                    @yield('content')
+                    @yield('content.create')
                 </div>
-
             </div>
-
         </section><!-- /About Section -->
-
+        @yield('loss_calculator')
+        @yield('topology-simulation')
         <!-- Stats Section -->
         {{-- <section id="stats" class="stats section">
 
@@ -771,7 +762,7 @@
 
         <div class="footer-newsletter">
             <div class="container">
-                <div class="row justify-content-center text-center">
+                <div class="row justify-content-center text-center" data-aos="fade-up">
                     <div class="col-lg-6">
                         <h4>Berlangganan di Hyperlink</h4>
                         <p>Dapatkan internet kencang dan stabil hanya di Hyperlink.</p>
@@ -781,7 +772,7 @@
         </div>
 
         <div class="container footer-top">
-            <div class="row">
+            <div class="row" data-aos="fade-up">
                 <div class="col-lg-5 footer-about">
                     <a href="index.html" class="d-flex align-items-center">
                         <span class="sitename">Hyperlink</span>
@@ -816,7 +807,12 @@
 
     <!-- Preloader -->
     <div id="preloader"></div>
+    <script>
+        const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
+        const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
+    </script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="{{ asset('assets/main.js') }}"></script>
     <!-- Vendor JS Files -->
     <script src="{{ asset('fe/vendor/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
