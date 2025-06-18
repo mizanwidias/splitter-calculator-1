@@ -4,7 +4,7 @@
 <head>
     <meta charset="utf-8">
     <meta content="width=device-width, initial-scale=1.0" name="viewport">
-    <title>{{ $title ?? 'Hyperlink' }}</title>
+    <title>{{ $title ?? 'Hyperlink - FSL' }}</title>
     <meta name="description" content="">
     <meta name="keywords" content="">
 
@@ -47,69 +47,43 @@
             <a href="{{ route('home') }}" class="logo d-flex align-items-center me-auto">
                 <!-- Uncomment the line below if you also wish to use an image logo -->
                 <img src="{{ asset('fe/img/hyp-set.png') }}" alt="">
-                <h1 class="sitename">Hyperlink Calculator</h1>
+                <h1 class="sitename">Fiber Loss Simulator</h1>
             </a>
 
             <nav id="navmenu" class="navmenu">
                 <ul>
-                    <li><a href="#home" class="active">Home</a></li>
-                    <li><a href="#loss_calculator">Loss Calculator</a></li>
-                    {{-- <li><a href="#services">Services</a></li>
-                    <li><a href="#portfolio">Portfolio</a></li>
-                    <li><a href="#team">Team</a></li>
-                    <li class="dropdown"><a href="#"><span>Dropdown</span> <i
-                                class="bi bi-chevron-down toggle-dropdown"></i></a>
-                        <ul>
-                            <li><a href="#">Dropdown 1</a></li>
-                            <li class="dropdown"><a href="#"><span>Deep Dropdown</span> <i
-                                        class="bi bi-chevron-down toggle-dropdown"></i></a>
-                                <ul>
-                                    <li><a href="#">Deep Dropdown 1</a></li>
-                                    <li><a href="#">Deep Dropdown 2</a></li>
-                                    <li><a href="#">Deep Dropdown 3</a></li>
-                                    <li><a href="#">Deep Dropdown 4</a></li>
-                                    <li><a href="#">Deep Dropdown 5</a></li>
-                                </ul>
-                            </li>
-                            <li><a href="#">Dropdown 2</a></li>
-                            <li><a href="#">Dropdown 3</a></li>
-                            <li><a href="#">Dropdown 4</a></li>
-                        </ul>
+                    <li>
+                        <a href="{{ route('home') }}#home" class="{{ request()->routeIs('home') ? 'active' : '' }}">
+                            Home
+                        </a>
                     </li>
-                    <li><a href="#contact">Contact</a></li> --}}
+                    <li>
+                        <a href="{{ route('home') }}#loss_calculator"
+                            class="{{ request()->routeIs('home') ? '' : '' }}">
+                            Loss Calculator
+                        </a>
+                    </li>
+                    {{-- <li>
+                        <a href="{{ route('topology') }}"
+                            class="{{ request()->routeIs('topology') ? 'active' : '' }}">
+                            FLS
+                        </a>
+                    </li> --}}
                 </ul>
                 <i class="mobile-nav-toggle d-xl-none bi bi-list"></i>
             </nav>
-
-            <a class="btn-getstarted" href="{{ route('home') }}">Get Started</a>
-
+            <a href="{{ route('topology') }}"
+                class="btn-getstarted {{ request()->routeIs('topology') ? 'text-black border border-success bg-transparent' : '' }}">Fiber
+                Loss Simulator
+            </a>
         </div>
     </header>
 
     <main class="main">
 
         <!-- Hero Section -->
-        <section id="home" class="hero section">
-            <div class="container">
-                <div class="row">
-                    <div class="col-lg-6 order-2 order-lg-1 d-flex flex-column justify-content-center"
-                        data-aos="fade-up">
-                        <h1>Bingung Menghitung Redaman?</h1>
-                        <p>Hitung Redaman Valid dan buat simulasi Io di sini</p>
-                        <div class="d-flex">
-                            <a href="{{ route('home') }}" class="btn-get-started">Get Started</a>
-                            <a href="https://www.youtube.com/watch?v=6Ioe_g3hJHc"
-                                class="glightbox btn-watch-video d-flex align-items-center"><i
-                                    class="bi bi-play-circle"></i><span>Tonton Ini</span></a>
-                        </div>
-                    </div>
-                    <div class="col-lg-6 order-1 order-lg-2 hero-img" data-aos="zoom-out" data-aos-delay="100">
-                        <img src="fe/img/hero-img.png" class="img-fluid animated" alt="">
-                    </div>
-                </div>
-            </div>
-
-        </section><!-- /Hero Section -->
+        @yield('content.hero')
+        <!-- /Hero Section -->
 
         <!-- Featured Services Section -->
 
@@ -163,6 +137,7 @@
 
                 <div class="row gy-4">
                     @yield('loss_calculator')
+                    @yield('content')
                 </div>
 
             </div>
@@ -854,7 +829,7 @@
     <script src="{{ asset('fe/vendor/swiper/swiper-bundle.min.js') }}"></script>
     <!-- Main JS File -->
     <script src="{{ asset('fe/js/main.js') }}"></script>
-
+    @stack('scripts')
 </body>
 
 </html>

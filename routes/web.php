@@ -21,3 +21,4 @@ Route::get('/', function () {
 
 
 Route::resource('/home', \App\Http\Controllers\HomeController::class)->name('index', 'home');
+Route::resource('/topology', \App\Http\Controllers\TopologyController::class)->name('index', 'topology');
