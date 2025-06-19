@@ -1,70 +1,71 @@
 @extends('fe.lab')
-@section('title', 'FTTH Topologi - ' . $lab['nama'])
+@section('title', 'Lab - ' . $lab['name'])
 @section('content')
-    <!-- Sidebar -->
-    <div id="sidebar">
-
-        <div class="inner">
-            {{-- Nama Lab --}}
-            <h2 class="fw-bold mb-3" style="color: #fff;">
-                {{ $lab['name'] }}
-            </h2>
-
-            {{-- Nama Author --}}
-            <p class="btn w-5 text-white fw-bold" style="background: linear-gradient(87deg, #627594 0, #8898aa 100%); border-radius: 50px">
-                <i class="bi bi-person-circle me-1"></i>
-                {{ $lab['author'] }}
-            </p>
-
-            {{-- Deskripsi --}}
-            <p style="font-size: 1rem; line-height: 1.6;">
-                {{ $lab['description'] ?? '🧪 No description provided for this lab yet.' }}
-            </p>
+    <!-- sidebar -->
+    <div id="sidebar" class="position-fixed sidebar-hidden">
+        <div class="inner p-3">
+            <!-- konten sidebar -->
+            <h5>{{ $lab['name'] }}</h5>
+            <h5>{{ $lab['author'] }}</h5>
+            <p><small>{{ $lab['description'] }}</small></p>
             <hr>
             <h5 class="text-white">Tambah Perangkat</h5>
             <label class="form-label text-white">Power OLT</label>
             <input type="number" id="input-power" class="form-control form-control-sm mb-2" value="7">
 
-            <button class="btn btn-sm btn-light w-100 mb-1" onclick="addNode('OLT')">+ OLT</button>
-            <button class="btn btn-sm btn-light w-100 mb-1" onclick="addNode('Splitter')">+ Splitter</button>
-            <button class="btn btn-sm btn-light w-100 mb-1" onclick="addNode('ODP')">+ ODP</button>
-            <button class="btn btn-sm btn-light w-100 mb-1" onclick="addNode('Client')">+ Client</button>
-
-            <hr class="text-white">
-
-            <label class="form-label text-white">Jenis Kabel</label>
-            <div class="d-flex gap-2 mb-2">
-                <div onclick="selectCable('0.2', 'dropcore', this)"
-                    class="cable-option p-2 bg-light text-dark rounded text-center flex-fill cursor-pointer">
-                    <div style="width: 30px; height: 5px; background-color: black; margin: auto;"></div>
-                    <small>Dropcore</small>
-                </div>
-                <div onclick="selectCable('0.3', 'patchcord', this)"
-                    class="cable-option p-2 bg-warning text-dark rounded text-center flex-fill cursor-pointer">
-                    <div style="width: 30px; height: 5px; background-color: yellow; margin: auto;"></div>
-                    <small>Patchcord</small>
-                </div>
+            <div class="d-grid gap-2 mb-2">
+                <button class="btn btn-sm text-dark fw-bold" onclick="addNode('OLT')">
+                    <i class="fas fa-broadcast-tower me-1"></i> OLT
+                </button>
+                <button class="btn btn-sm text-dark fw-bold" onclick="addNode('Splitter')">
+                    <i class="fas fa-code-branch me-1"></i> Splitter
+                </button>
+                {{-- <button class="btn btn-sm btn-outline-primary text-dark" onclick="addNode('ODP')">
+                    <i class="fas fa-network-wired me-1"></i> ODP
+                </button> --}}
+                <button class="btn btn-sm text-dark fw-bold" onclick="addNode('Client')">
+                    <i class="fas fa-user me-1"></i> Client
+                </button>
             </div>
 
-            <label class="form-label text-white">Panjang Kabel (m)</label>
-            <input type="number" id="cable-length" class="form-control form-control-sm mb-2" value="50">
 
-            <label class="form-label text-white">Connector</label>
-            <input type="number" id="connectors" class="form-control form-control-sm mb-2" value="2">
+            <hr class="text-white">
+            <div class="hidden-ui" style="display: none">
+                <label class="form-label text-white">Jenis Kabel</label>
+                <div class="d-flex gap-2 mb-2" style="display: none">
+                    <div onclick="selectCable('0.2', 'dropcore', this)"
+                        class="cable-option p-2 bg-light text-dark rounded text-center flex-fill cursor-pointer">
+                        <div style="width: 30px; height: 5px; background-color: black; margin: auto;"></div>
+                        <small>Dropcore</small>
+                    </div>
+                    <div onclick="selectCable('0.3', 'patchcord', this)"
+                        class="cable-option p-2 bg-warning text-dark rounded text-center flex-fill cursor-pointer">
+                        <div style="width: 30px; height: 5px; background-color: yellow; margin: auto;"></div>
+                        <small>Patchcord</small>
+                    </div>
+                </div>
 
-            <label class="form-label text-white">Splicing</label>
-            <input type="number" id="splicing" class="form-control form-control-sm mb-2" value="1">
+
+                <label class="form-label text-white">Panjang Kabel (m)</label>
+                <input type="number" id="cable-length" class="form-control form-control-sm mb-2" value="50">
+
+                <label class="form-label text-white">Connector</label>
+                <input type="number" id="connectors" class="form-control form-control-sm mb-2" value="2">
+
+                <label class="form-label text-white">Splicing</label>
+                <input type="number" id="splicing" class="form-control form-control-sm mb-2" value="1">
+            </div>
 
             <div class="">
-                <button class="btn btn-sm btn-success w-50 mb-1" onclick="saveTopology()">💾 Simpan Topologi</button>
-                <button class="btn btn-sm btn-warning w-50 mb-1" onclick="resetMap()">Reset</button>
-                <button class="btn btn-sm btn-danger w-50 mb-1" onclick="undoAction()">↩ Undo</button>
+                <button class="btn btn-sm btn-success w-100 mb-1" onclick="saveTopology()">💾 Simpan Topologi</button>
+                <button class="btn btn-sm btn-warning w-100 mb-1" onclick="resetMap()">Reset</button>
+                <button class="btn btn-sm btn-danger w-100 mb-1" onclick="undoAction()">↩ Undo</button>
             </div>
             <hr>
             <a href="/lab" class="btn btn-sm btn-secondary w-100">🚪 Keluar</a>
-
         </div>
     </div>
+
 
     <!-- Modal Pilih Splitter -->
     <div class="modal fade" id="splitterModal" tabindex="-1" aria-labelledby="splitterModalLabel" aria-hidden="true">
@@ -105,7 +106,66 @@
         </div>
     </div>
 
+    <!-- Tabel Status Power Loss -->
+    <div id="status-table-box" class="bg-white border rounded shadow-sm p-2 d-none d-md-block">
+        <h6 class="text-center mb-2">📋 Tabel Status Power Loss</h6>
+        <table class="table table-bordered table-sm mb-0 text-center">
+            <thead class="table-dark">
+                <tr>
+                    <th style="font-size: 12px;">Power Loss</th>
+                    <th style="font-size: 12px;">Keterangan</th>
+                    <th style="font-size: 12px;">Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>&gt; 0</td>
+                    <td>Invalid</td>
+                    <td><span class="badge bg-secondary">⚪️</span></td>
+                </tr>
+                <tr>
+                    <td>&gt; -1 s/d ≤ 0</td>
+                    <td>Too Strong</td>
+                    <td><span class="badge bg-warning">⚡</span></td>
+                </tr>
+                <tr>
+                    <td>&gt; -15 s/d ≤ -1</td>
+                    <td>Good</td>
+                    <td><span class="badge bg-success">✅</span></td>
+                </tr>
+                <tr>
+                    <td>&gt; -28 s/d ≤ -15</td>
+                    <td>Too Low</td>
+                    <td><span class="badge bg-warning">⚠️</span></td>
+                </tr>
+                <tr>
+                    <td>≤ -28</td>
+                    <td>Bad</td>
+                    <td><span class="badge bg-danger">❌</span></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
 @endsection
+@if (session('success'))
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const Toast = Swal.mixin({
+                toast: true,
+                position: 'top-end',
+                showConfirmButton: false,
+                timer: 2500,
+                timerProgressBar: true,
+            });
+
+            Toast.fire({
+                icon: 'success',
+                title: '{{ session('success') }}'
+            });
+        });
+    </script>
+@endif
 @push('scripts')
     <script src="https://cdnjs.cloudflare.com/ajax/libs/leader-line/1.0.7/leader-line.min.js"></script>
     <script>
@@ -167,12 +227,17 @@
                 new bootstrap.Modal(document.getElementById('splitterModal')).show();
                 return;
             }
-
             const el = document.createElement("div");
             el.classList.add("position-absolute", "p-2", "bg-white", "border", "rounded", "text-center");
-            el.style.top = "100px";
-            el.style.left = "100px";
             el.setAttribute("id", `node-${nodeId}`);
+
+            const canvas = document.getElementById("map-canvas");
+            const canvasRect = canvas.getBoundingClientRect();
+            const centerX = canvas.clientWidth / 2;
+            const centerY = canvas.clientHeight / 2;
+
+            el.style.left = `${centerX - 50}px`; // sesuaikan offset jika ukuran node berbeda
+            el.style.top = `${centerY - 25}px`;
 
             let label = type;
             let loss = 0;
@@ -202,30 +267,72 @@
             el.dataset.loss = loss;
             el.dataset.power = "";
 
-            el.addEventListener('click', () => {
+            el.addEventListener('click', function() {
+                const clickedEl = this;
+
                 if (!selectedNode) {
-                    selectedNode = el;
-                    el.classList.add('border-primary');
-                } else if (selectedNode !== el) {
-                    const length = parseFloat(prompt("Masukkan panjang kabel (meter):", document.getElementById(
-                        "cable-length").value));
-                    if (!isNaN(length)) {
-                        connectNodeElements(selectedNode, el, length);
-                    }
-                    selectedNode.classList.remove('border-primary');
-                    selectedNode = null;
+                    selectedNode = clickedEl;
+                    clickedEl.classList.add('border-primary');
+                } else if (selectedNode !== clickedEl) {
+                    Swal.fire({
+                        title: 'Hubungkan Node',
+                        html: `
+                <div class="text-start mb-2">Panjang Kabel (meter)</div>
+                <input id="swal-length" type="number" class="swal2-input" value="${document.getElementById("cable-length")?.value || 50}">
+
+                <div class="text-start mb-2 mt-2">Jenis Kabel</div>
+                <select id="swal-cable" class="swal2-select">
+                    <option value="dropcore" selected>Dropcore (0.2 dB/km)</option>
+                    <option value="patchcord">Patchcord (0.3 dB/km)</option>
+                </select>
+            `,
+                        focusConfirm: false,
+                        confirmButtonText: 'Hubungkan',
+                        showCancelButton: true,
+                        cancelButtonText: 'Batal',
+                        preConfirm: () => {
+                            const length = parseFloat(document.getElementById('swal-length').value);
+                            const type = document.getElementById('swal-cable').value;
+
+                            if (!length || length <= 0) {
+                                Swal.showValidationMessage('Panjang kabel tidak valid!');
+                                return;
+                            }
+
+                            return {
+                                length,
+                                type
+                            };
+                        }
+                    }).then(result => {
+                        if (result.isConfirmed) {
+                            const {
+                                length,
+                                type
+                            } = result.value;
+
+                            if (type === 'dropcore') {
+                                window.selectedCableLoss = 0.2 / 1000;
+                                window.selectedCableColor = 'black';
+                                window.selectedCableName = 'Dropcore';
+                            } else if (type === 'patchcord') {
+                                window.selectedCableLoss = 0.3 / 1000;
+                                window.selectedCableColor = 'yellow';
+                                window.selectedCableName = 'Patchcord';
+                            }
+
+                            // ⬇️ INI YANG KRUSIAL: pakai clickedEl sebagai node tujuan
+                            connectNodeElements(selectedNode, clickedEl, length);
+                            selectedNode.classList.remove('border-primary');
+                            selectedNode = null;
+                        }
+                    });
                 } else {
-                    selectedNode.classList.remove('border-primary');
+                    clickedEl.classList.remove('border-primary');
                     selectedNode = null;
                 }
-                // Klik kanan untuk hapus
-                el.addEventListener('contextmenu', function(e) {
-                    e.preventDefault();
-                    if (confirm('Hapus node ini beserta kabel yang terhubung?')) {
-                        deleteNode(el);
-                    }
-                });
             });
+
 
             makeDraggable(el);
             document.getElementById("map-canvas").appendChild(el);
@@ -260,7 +367,7 @@
         }
 
         function connectNodeElements(source, target, length) {
-            const lossCable = length * selectedCableLoss;
+            const lossCable = length * window.selectedCableLoss;
             const lossTarget = parseFloat(target.dataset.loss || 0);
             const totalConnectors = parseInt(document.getElementById("connectors").value || 0);
             const totalSplicing = parseInt(document.getElementById("splicing").value || 0);
@@ -282,7 +389,7 @@
                     x: '50%',
                     y: '50%'
                 }), {
-                    color: selectedCableColor,
+                    color: window.selectedCableColor,
                     size: 2,
                     path: 'straight',
                     startPlug: 'none',
@@ -294,14 +401,14 @@
                         color: 'red',
                         fontSize: '12px'
                     }),
-                    startLabel: selectedCableName
+                    startLabel: window.selectedCableName
                 }
             );
 
             lines.push({
                 from: source.id,
                 to: target.id,
-                cable: selectedCableName,
+                cable: window.selectedCableName,
                 line
             });
 
@@ -315,17 +422,18 @@
             addLineContextMenu({
                 from: source.id,
                 to: target.id,
-                cable: selectedCableName,
+                cable: window.selectedCableName,
                 line
             });
+
             actions.push({
                 type: 'add-connection',
                 line: line,
                 from: source.id,
                 to: target.id
             });
-
         }
+
 
         function undoAction() {
             if (actions.length === 0) return;

@@ -12,7 +12,7 @@ class LabController extends Controller
      */
     public function index()
     {
-        $labs = Lab::latest()->get(); // Ambil semua lab, urutkan dari yang terbaru
+        $labs = Lab::paginate(10); // Ambil semua lab
 
         return view('lab.index', [
             'title' => 'Labs Collection',
@@ -49,7 +49,7 @@ class LabController extends Controller
         ]);
 
         // Redirect ke halaman topologi
-        return redirect()->route('lab.canvas', $lab->id);
+        return redirect()->route('lab.canvas', $lab->id)->with('success', 'Lab berhasil dibuat!');
     }
 
     /**
@@ -73,15 +73,34 @@ class LabController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        //
+        $lab = Lab::findOrFail($id);
+
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'author' => 'required|string|max:255',
+            'description' => 'nullable|string',
+        ]);
+
+        $lab->update([
+            'name' => $request->name,
+            'author' => $request->author,
+            'description' => $request->description,
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Lab berhasil diperbarui!'
+        ]);
     }
 
     /**
      * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
+     */ public function destroy(string $id)
     {
-        //
+        $lab = Lab::findOrFail($id);
+        $lab->delete();
+
+        return redirect()->route('lab')->with('success', 'Lab berhasil dihapus!');
     }
 
     public function topologi(Lab $lab)

@@ -4,9 +4,10 @@
   <head>
       <meta charset="UTF-8">
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <title>Splitter Calculator - @yield('title')</title>
+      <title>@yield('title')</title>
+      <link href="{{ asset('fe/img/hyp-tam.png') }}" rel="icon">
       <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-      <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+      <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
       <meta name="csrf-token" content="{{ csrf_token() }}">
   </head>
   <style>
@@ -24,64 +25,100 @@
           border: 2px solid blue;
       }
 
+      /* Biarkan halaman bisa discroll jika tinggi lebih dari viewport */
       body,
       html {
           margin: 0;
           padding: 0;
           height: 100%;
-          overflow: hidden;
+          overflow-x: hidden;
+          /* biar scroll horizontal tidak muncul */
       }
 
+      /* ===== SIDEBAR (auto-hide & scrollable) ===== */
       #sidebar {
-          position: absolute;
-          left: 0;
+          position: fixed;
           top: 0;
           bottom: 0;
-          width: 50px;
-          background: #10BC69;
-          transition: width 0.3s;
-          z-index: 1000;
+          left: 0;
+          width: 250px;
+          overflow-y: auto;
+          background-color: #10BC69;
+          color: white;
+          transition: transform 0.3s ease;
+          z-index: 1030;
+      }
+
+      .sidebar-hidden {
+          transform: translateX(-220px);
+          /* sisakan hover area */
       }
 
       #sidebar:hover {
-          width: 300px;
+          transform: translateX(0);
       }
 
-      #sidebar .inner {
-          display: none;
-          padding: 15px;
-          color: white;
+      /* Hover trigger area */
+      #sidebar::before {
+          content: "";
+          position: fixed;
+          top: 0;
+          left: 0;
+          width: 30px;
+          height: 100vh;
+          z-index: 1029;
       }
 
-      #sidebar:hover .inner {
-          display: block;
-      }
-
+      /* ===== MAIN AREA ===== */
       #map-canvas {
           position: absolute;
           top: 0;
-          left: 50px;
+          left: 30px;
+          /* karena sidebar sembunyi sisakan 30px */
           right: 0;
           bottom: 0;
           background-color: #f4faff;
           z-index: 0;
       }
 
-      #info-panel {
-          position: fixed;
-          right: 15px;
-          top: 15px;
-          width: 280px;
-          z-index: 1100;
-      }
-
-      #info-card {
+      /* ===== STATUS TABEL ===== */
+      #status-table-box {
           position: fixed;
           top: 20px;
           right: 20px;
-          width: 250px;
-          z-index: 1000;
-          background-color: white;
+          width: 300px;
+          z-index: 1040;
+      }
+
+      /* ===== INFO CARD (selalu tampil di bawah tabel) ===== */
+      #info-card {
+          position: fixed;
+          top: 240px;
+          /* pastikan tidak menumpuk dengan status-table */
+          right: 20px;
+          width: 300px;
+          z-index: 1050;
+      }
+
+      /* Responsive kecil */
+      @media (max-height: 700px) {
+          #info-card {
+              top: 200px;
+          }
+
+          #status-table-box {
+              top: 10px;
+          }
+      }
+
+      @media (max-width: 768px) {
+
+          #info-card,
+          #status-table-box {
+              position: static;
+              width: 100%;
+              margin-bottom: 10px;
+          }
       }
   </style>
 
