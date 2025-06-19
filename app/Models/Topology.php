@@ -11,8 +11,8 @@ class Topology extends Model
     protected $fillable = [
         'id',
         'lab_id',
-        'nama',
-        'deskripsi',
+        'name',
+        'description',
         'nodes',
         'connections',
     ];

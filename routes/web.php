@@ -1,8 +1,10 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\LossCalculatorController;
 use App\Http\Controllers\LabController;
+use App\Http\Controllers\LossCalculatorController;
+use App\Http\Controllers\TopologyController;
+use Illuminate\Support\Facades\Route;
+
 
 
 /*
@@ -24,3 +26,5 @@ Route::get('/', function () {
 Route::resource('/home', \App\Http\Controllers\HomeController::class)->name('index', 'home');
 Route::resource('/lab', \App\Http\Controllers\LabController::class)->name('index', 'lab');
 Route::get('/lab/{lab}/topologi', [LabController::class, 'topologi'])->name('lab.canvas');
+Route::post('/topologi/save/{id}', [TopologyController::class, 'save']);
+Route::get('/topologi/load/{id}', [TopologyController::class, 'load']);

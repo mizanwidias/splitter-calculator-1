@@ -14,12 +14,24 @@
 
             <div class="card card-rounded shadow" style="border: 0" data-aos="fade-up">
                 <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-center mb-4">
-                        <h3 class="fw-bold" style="color: #10BC69">Labs Table</h3>
-                        <a href="{{ route('lab.create') }}" class="btn w-5 text-white fw-bold"
-                            style="background: linear-gradient(87deg, #2dce89 0, #10BC69 100%)">
-                            <i class="bi bi-plus-circle me-1"></i> Create My Lab
-                        </a>
+                    <!-- Search input & create button in one row -->
+                    <div class="d-flex flex-column flex-md-row justify-content-between align-items-center mb-4 gap-2">
+                        <h3 class="fw-bold m-0" style="color: #10BC69">Labs Table</h3>
+
+                        <div class="d-flex gap-2 align-items-center">
+                            <form method="GET" action="{{ route('lab') }}" class="d-flex gap-2 align-items-center">
+                                <input type="text" name="search" class="form-control" placeholder="🔍 Search ..."
+                                    value="{{ request('search') }}">
+                                <button type="submit" class="btn text-white fw-bold"
+                                    style="white-space: nowrap; background: linear-gradient(87deg, #2dce89 0, #10BC69 100%)">
+                                    <i class="bi bi-search"></i>
+                                </button>
+                            </form>
+                            <a href="{{ route('lab.create') }}" class="btn text-white fw-bold"
+                                style="white-space: nowrap; background: linear-gradient(87deg, #2dce89 0, #10BC69 100%)">
+                                <i class="bi bi-plus-circle me-1"></i> Create My Lab
+                            </a>
+                        </div>
                     </div>
                     <div class="table-responsive">
                         <table class="table table-hover align-middle text-center" style="border-color: #10BC69">
@@ -33,7 +45,7 @@
                                     <th>Action</th>
                                 </tr>
                             </thead>
-                            <tbody>
+                            <tbody id="lab-table-body">
                                 @forelse ($labs as $no => $lab)
                                     <tr>
                                         <td style="font-weight: bold; border-right: 2px solid #10BC69">
@@ -101,9 +113,9 @@
                                     style="color: #10BC69">{{ $labs->total() }}</span>
                                 results
                             </div>
-                            <div>
+                            <div id="pagination-links">
                                 {{-- Hanya tampilkan pagination --}}
-                                {!! $labs->links() !!}
+                                {!! $labs->appends(['search' => request('search')])->links() !!}
                             </div>
                         </div>
                     </div>

@@ -42,7 +42,7 @@
                     </button>
 
                     <a href="{{ route('lab') }}" class="btn w-5 text-white fw-bold"
-                        style="background: linear-gradient(87deg, #627594 0, #8898aa 100%);">
+                        style="background: linear-gradient(87deg, #627594 0, #8898aa 100%);border: none;">
                         Back
                     </a>
                 </form>

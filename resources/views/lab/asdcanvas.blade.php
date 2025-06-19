@@ -1,87 +1,80 @@
 @extends('fe.lab')
-@section('title', 'Lab - ' . $lab['name'])
+
+@section('title', 'Lab - ' . $lab['nama'])
+
 @section('content')
     <!-- sidebar -->
     <div id="sidebar" class="position-fixed sidebar-hidden">
         <div class="inner p-3">
             <!-- konten sidebar -->
-            <a href="{{ route('lab') }}" class="btn w-100 text-white fw-bold"
-                style="background: linear-gradient(87deg, #627594 0, #8898aa 100%);
-           border-radius: 25px;
-           border: none;
-           pointer-events: none;">
-                <i class="bi bi-person-circle me-1"></i>
-                {{ $lab['author'] }}
-            </a>
-            <div class="divider my-3"></div>
-            <div class="mb-2">
-                <h5 class="fw-bold text-dark">Input Power OLT</h5>
-                <input type="number" id="input-power" class="form-control form-control-sm mb-2" value="7">
-            </div>
-            <div class="mb-2">
-                <h5 class="fw-bold text-dark">Splicing</h5>
-                <input type="number" id="splicing" class="form-control form-control-sm mb-2" value="1">
-            </div>
-            <h5 class="fw-bold text-dark">Add Node</h5>
+            <h5>Lab: {{ $lab['name'] }}</h5>
+            <p><small>{{ $lab['description'] }}</small></p>
+            <hr>
+            <h5 class="text-white">Tambah Perangkat</h5>
+            <label class="form-label text-white">Power OLT</label>
+            <input type="number" id="input-power" class="form-control form-control-sm mb-2" value="7">
+
             <div class="d-grid gap-2 mb-2">
-                <button class="btn btn-sm btn-light text-dark fw-bold" onclick="addNode('OLT')">
+                <button class="btn btn-sm btn-outline-primary text-dark" onclick="addNode('OLT')">
                     <i class="fas fa-broadcast-tower me-1"></i> OLT
                 </button>
-                <button class="btn btn-sm btn-light text-dark fw-bold" onclick="addNode('Splitter')">
+                <button class="btn btn-sm btn-outline-primary text-dark" onclick="addNode('Splitter')">
                     <i class="fas fa-code-branch me-1"></i> Splitter
                 </button>
-                {{-- <button class="btn btn-sm btn-outline-primary text-dark" onclick="addNode('ODP')">
+                <button class="d-none btn btn-sm btn-outline-primary text-dark" onclick="addNode('ODP')">
                     <i class="fas fa-network-wired me-1"></i> ODP
-                </button> --}}
-                <button class="btn btn-sm btn-light text-dark fw-bold" onclick="addNode('Client')">
+                </button>
+                <button class="btn btn-sm btn-outline-primary text-dark" onclick="addNode('Client')">
                     <i class="fas fa-user me-1"></i> Client
                 </button>
             </div>
-            <h5 class="fw-bold text-dark">Cable Type</h5>
-            <div class="d-flex gap-2 mb-2">
-                <div class="cable-option p-2 bg-light text-dark rounded text-center flex-fill cursor-pointer">
+
+
+            <hr class="text-white">
+
+            <!-- <label class="form-label text-white">Jenis Kabel</label> -->
+            <div class="d-none gap-2 mb-2">
+                <div onclick="selectCable('0.2', 'dropcore', this)"
+                    class="cable-option p-2 bg-light text-dark rounded text-center flex-fill cursor-pointer">
                     <div style="width: 30px; height: 5px; background-color: black; margin: auto;"></div>
                     <small>Dropcore</small>
                 </div>
-                <div class="cable-option p-2 bg-warning text-dark rounded text-center flex-fill cursor-pointer">
+                <div onclick="selectCable('0.3', 'patchcord', this)"
+                    class="cable-option p-2 bg-warning text-dark rounded text-center flex-fill cursor-pointer">
                     <div style="width: 30px; height: 5px; background-color: yellow; margin: auto;"></div>
                     <small>Patchcord</small>
                 </div>
             </div>
-            <div class="divider my-3"></div>
-            <div class="hidden-ui" style="display: none">
 
-
-                <label class="form-label text-white">Panjang Kabel (m)</label>
-                <input type="number" id="cable-length" class="form-control form-control-sm mb-2" value="50">
-
+            <div class="d-none">
                 <label class="form-label text-white">Connector</label>
                 <input type="number" id="connectors" class="form-control form-control-sm mb-2" value="2">
-
-                <label class="form-label text-white">Splicing</label>
-                <input type="number" id="splicing" class="form-control form-control-sm mb-2" value="1">
             </div>
 
-            <div class="d-grid gap-2 mb-2">
-                <button class="btn btn-sm btn-light w-100 fw-bold" onclick="gatherAndSaveTopology()"><i
-                        class="bi bi-bookmark-plus-fill"></i> Save Topology</button>
-                <button class="btn btn-sm btn-light w-100 fw-bold" onclick="resetTopology()">Reset</button>
-                <button class="btn btn-sm btn-light w-100 fw-bold" onclick="undoAction()">↩ Undo</button>
+            <div class="d-none">
+                <label class="form-label text-white">Panjang Kabel (m)</label>
+                <input type="number" id="connectors" class="form-control form-control-sm mb-2" value="2">
             </div>
-            <div class="divider my-3"></div>
-            <h5 class="fw-bold text-dark"><i class="bi bi-file-earmark-code-fill"></i> Manage File</h5>
+
+
+            <label class="form-label text-white">Splicing</label>
+            <input type="number" id="splicing" class="form-control form-control-sm mb-2" value="1">
+
+            <div class="">
+                <button class="btn btn-sm btn-success w-100 mb-1" onclick="gatherAndSaveTopology()">💾 Simpan</button>
+                <button class="btn btn-sm btn-warning w-100 mb-1" onclick="resetMap()">Reset</button>
+                <button class="btn btn-sm btn-danger w-100 mb-1" onclick="undoAction()">↩ Undo</button>
+
+            </div>
+            <hr>
+            <label class="form-label text-white">Manajemen File</label>
             <div class="d-grid gap-2 mb-2">
-                <button class="btn btn-sm"
-                    style="background: linear-gradient(87deg, #2d93ce 0, #107abc 100%); border: none;"
-                    onclick="exportTopology()">⬇️ Export (.json)</button>
+                <button class="btn btn-sm btn-info" onclick="exportTopology()">⬇️ Export (.json)</button>
                 <input type="file" id="import-file" accept=".json" class="form-control form-control-sm"
                     onchange="importTopology(this.files[0])">
             </div>
-            <div class="divider my-3"></div>
-            <a href="{{ route('lab') }}" class="btn w-100 text-white fw-bold mb-2"
-                style="background: linear-gradient(87deg, #627594 0, #8898aa 100%);border-radius: 25px; border: none;"><i
-                    class="bi bi-x-circle"></i> Keluar</a>
-            <img src="{{ asset('fe/img/hyp-set.png') }}" class="w-100 h-25 mt-3" alt="">
+            <hr>
+            <a href="/lab" class="btn btn-sm btn-secondary w-100">🚪 Keluar</a>
         </div>
     </div>
 
@@ -111,17 +104,10 @@
         </div>
     </div>
     <!-- Canvas Full Area -->
-    <div id="map-canvas" data-lab-id="{{ $lab['id'] }}" style="position: relative; height: 100vh;">
-    </div>
-
-    {{-- <!-- Jadi style baru: -->
-<div id="map-canvas" data-lab-id="{{ $lab['id'] }}"
-     style="position: relative; height: 100vh; overflow: hidden; border: 2px dashed #ccc;">
-</div> --}}
+    <div id="map-canvas" data-lab-id="{{ $lab['id'] }}"></div>
 
     <!-- Informasi Loss Panel -->
-    <div id="info-card" class="card shadow-sm border border-info d-none"
-        style="position: fixed; top: 360px; right: 20px; min-width: 250px;transition: all 0.3s ease-in-out; z-index: 1;">
+    <div id="info-card" class="card shadow-sm border border-info d-none">
         <div class="card-body">
             <h5 class="card-title text-info">📊 Informasi Loss</h5>
             <hr>
@@ -132,157 +118,49 @@
         </div>
     </div>
 
-    <!-- Button toggle -->
-    <button onclick="toggleStatusTable()" class="btn fw-bold"
-        style="background: linear-gradient(87deg, #2dce89 0, #10BC69 100%); position: fixed; bottom: 20px; right: 20px; border-radius: 25px; color: #323233;">
-        <i class="bi bi-table"></i> Tabel Status
-    </button>
-
     <!-- Tabel Status Power Loss -->
-    <div id="status-table-box" class="bg-white border rounded shadow-lg p-3 mt-3"
-        style="width: 350px;display: none; animation: float 2s ease-in-out infinite; z-index: 2;">
-        <h5 class="mb-3 text-black text-center">📋 Tabel Status Power Loss</h5>
-        <div class="table-responsive">
-            <table class="table table-striped table-dark text-center align-middle rounded overflow-hidden">
-                <thead class="table-success text-dark">
-                    <tr>
-                        <th style="font-size: 13px;">Power Loss</th>
-                        <th style="font-size: 13px;">Keterangan</th>
-                        <th style="font-size: 13px;">Status</th>
-                    </tr>
-                </thead>
-                <tbody style="font-size: 13px;">
-                    <tr>
-                        <td>&gt; 0</td>
-                        <td>Invalid</td>
-                        <td><span class="badge bg-secondary px-3 py-1">⚪️</span></td>
-                    </tr>
-                    <tr>
-                        <td>&gt; -1 s/d ≤ -10</td>
-                        <td>Too Strong</td>
-                        <td><span class="badge px-3 py-1" style="background-color: #ebe79a;">⚠️</span></td>
-                    </tr>
-                    <tr>
-                        <td>&gt; -11 s/d ≤ -22</td>
-                        <td>Good</td>
-                        <td><span class="badge px-3 py-1" style="background-color: #b8eb9a;">✅</span></td>
-                    </tr>
-                    <tr>
-                        <td>&gt; -24 s/d ≤ -32</td>
-                        <td>Too Low</td>
-                        <td><span class="badge px-3 py-1" style="background-color: #eb9ac4;">🛑</span></td>
-                    </tr>
-                    <tr>
-                        <td>≤ -40</td>
-                        <td>Bad</td>
-                        <td><span class="badge px-3 py-1" style="background-color: #eb9a9a;">❌</span></td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
+    <div id="status-table-box" class="bg-white border rounded shadow-sm p-2 d-none d-md-block">
+        <h6 class="text-center mb-2">📋 Tabel Status Power Loss</h6>
+        <table class="table table-bordered table-sm mb-0 text-center">
+            <thead class="table-dark">
+                <tr>
+                    <th style="font-size: 12px;">Power Loss</th>
+                    <th style="font-size: 12px;">Keterangan</th>
+                    <th style="font-size: 12px;">Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>&gt; 0</td>
+                    <td>Invalid</td>
+                    <td><span class="badge bg-secondary">⚪️</span></td>
+                </tr>
+                <tr>
+                    <td>&gt; -1 s/d ≤ -10</td>
+                    <td>Too Strong</td>
+                    <td><span class="badge bg-warning">⚡</span></td>
+                </tr>
+                <tr>
+                    <td>&gt; -11 s/d ≤ -22</td>
+                    <td>Good</td>
+                    <td><span class="badge bg-success">✅</span></td>
+                </tr>
+                <tr>
+                    <td>&gt; -24 s/d ≤ -32</td>
+                    <td>Too Low</td>
+                    <td><span class="badge bg-warning">⚠️</span></td>
+                </tr>
+                <tr>
+                    <td>≤ -40</td>
+                    <td>Bad</td>
+                    <td><span class="badge bg-danger">❌</span></td>
+                </tr>
+            </tbody>
+        </table>
     </div>
 
-    <script>
-        function toggleStatusTable() {
-            const box = document.getElementById("status-table-box");
-            box.style.display = (box.style.display === "none") ? "block" : "none";
-        }
-    </script>
-
-    {{-- Form untuk update name lab, author & description --}}
-    <form id="lab-update-form" method="POST" action="{{ route('lab.update', $lab['id']) }}" style="display: none;">
-        @csrf
-        @method('PUT')
-        <input type="hidden" name="name" id="lab-update-name">
-        <input type="hidden" name="author" id="lab-update-author">
-        <input type="hidden" name="description" id="lab-update-description">
-    </form>
-
-    {{-- Session untuk "Success" yang memunculkan swall --}}
-    @if (session('success'))
-        <script>
-            document.addEventListener('DOMContentLoaded', function() {
-                const Toast = Swal.mixin({
-                    toast: true,
-                    position: 'top-end',
-                    showConfirmButton: false,
-                    timer: 2500,
-                    timerProgressBar: true,
-                });
-
-                Toast.fire({
-                    icon: 'success',
-                    title: '{{ session('success') }}'
-                });
-            });
-        </script>
-    @endif
-
-    {{-- Modal untuk update name lab, author & description --}}
-    <script>
-        function showEditLabForm() {
-            Swal.fire({
-                title: '🛠 Edit Informasi Lab',
-                html: `
-        <div class="text-start mb-2"><label class="form-label fw-bold">Nama Lab</label>
-            <input id="lab-name" class="form-control" value="{{ $lab['name'] }}">
-        </div>
-        <div class="text-start mb-2"><label class="form-label fw-bold">Author</label>
-            <input id="lab-author" class="form-control" value="{{ $lab['author'] }}">
-        </div>
-        <div class="text-start mb-2"><label class="form-label fw-bold">Deskripsi</label>
-            <textarea id="lab-description" class="form-control" rows="3">{{ $lab['description'] }}</textarea>
-        </div>
-    `,
-                width: 600,
-                confirmButtonText: '💾 Simpan Perubahan',
-                confirmButtonColor: '#10BC69',
-                cancelButtonText: 'Batal',
-                showCancelButton: true,
-                focusConfirm: false,
-                showClass: {
-                    popup: 'animate__animated animate__fadeInDown'
-                },
-                hideClass: {
-                    popup: 'animate__animated animate__fadeOutUp'
-                },
-                customClass: {
-                    popup: 'animate__animated animate__fadeInDown'
-                },
-                didOpen: () => {
-                    document.querySelector('.swal2-popup')?.classList.add('float-style');
-                },
-                willClose: () => {
-                    document.querySelector('.swal2-popup')?.classList.remove('float-style');
-                },
-                preConfirm: () => {
-                    const name = document.getElementById('lab-name').value.trim();
-                    const author = document.getElementById('lab-author').value.trim();
-                    const description = document.getElementById('lab-description').value.trim();
-
-                    if (!name || !author) {
-                        Swal.showValidationMessage('Nama dan Author tidak boleh kosong!');
-                        return false;
-                    }
-
-                    return {
-                        name,
-                        author,
-                        description
-                    };
-                }
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    document.getElementById('lab-update-name').value = result.value.name;
-                    document.getElementById('lab-update-author').value = result.value.author;
-                    document.getElementById('lab-update-description').value = result.value.description;
-                    document.getElementById('lab-update-form').submit();
-                }
-            });
-        }
-    </script>
 @endsection
-{{-- Script untuk membuat dan mengedit canvas --}}
+
 @push('scripts')
     <script src="https://cdnjs.cloudflare.com/ajax/libs/leader-line/1.0.7/leader-line.min.js"></script>
     <script>
@@ -322,25 +200,8 @@
                 if (!isDragging) return;
                 const canvas = document.getElementById('map-canvas');
                 const canvasRect = canvas.getBoundingClientRect();
-
-                // Hitung posisi baru
-                let newLeft = e.clientX - canvasRect.left - offsetX;
-                let newTop = e.clientY - canvasRect.top - offsetY;
-
-                // AMANKAN: Batas kiri, atas, kanan, bawah
-                const maxLeft = canvas.clientWidth - el.offsetWidth;
-                const maxTop = canvas.clientHeight - el.offsetHeight;
-
-                if (newLeft < 0) newLeft = 0;
-                if (newTop < 0) newTop = 0;
-                if (newLeft > maxLeft) newLeft = maxLeft;
-                if (newTop > maxTop) newTop = maxTop;
-
-                // Set posisi aman
-                el.style.left = `${newLeft}px`;
-                el.style.top = `${newTop}px`;
-
-                // Update garis
+                el.style.left = (e.clientX - canvasRect.left - offsetX) + 'px';
+                el.style.top = (e.clientY - canvasRect.top - offsetY) + 'px';
                 lines.forEach(link => {
                     if (link.from === el.id || link.to === el.id) {
                         link.line.position();
@@ -599,6 +460,7 @@
             document.getElementById("info-card").classList.add("d-none");
         }
 
+
         function resetMap() {
             // Hapus semua garis
             lines.forEach(link => link.line.remove());
@@ -614,49 +476,6 @@
 
             // Sembunyikan info
             document.getElementById("info-card").classList.add("d-none");
-        }
-
-        function resetTopology() {
-            Swal.fire({
-                title: 'Yakin ingin mereset?',
-                text: 'Semua node dan koneksi akan dihapus!',
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonText: 'Ya, reset!',
-                confirmButtonColor: 'red',
-                cancelButtonText: 'Batal',
-            }).then((result) => {
-                const Toast = Swal.mixin({
-                    toast: true,
-                    position: 'top-end',
-                    showConfirmButton: false,
-                    timer: 2500,
-                    timerProgressBar: true,
-                });
-
-                if (result.isConfirmed) {
-                    lines.forEach(link => link.line.remove());
-                    lines = [];
-
-                    const canvas = document.getElementById("map-canvas");
-                    canvas.innerHTML = '';
-
-                    nodeId = 0;
-                    selectedNode = null;
-
-                    document.getElementById("info-card").classList.add("d-none");
-
-                    Toast.fire({
-                        icon: 'success',
-                        title: 'Topologi berhasil direset!'
-                    });
-                } else if (result.dismiss === Swal.DismissReason.cancel) {
-                    Toast.fire({
-                        icon: 'info',
-                        title: 'Reset dibatalkan'
-                    });
-                }
-            });
         }
 
         const labId = "{{ $lab['id'] }}";
@@ -851,22 +670,10 @@
                 connections
             } = topology;
 
-            const Toast = Swal.mixin({
-                toast: true,
-                position: 'top-end',
-                showConfirmButton: false,
-                timer: 2500,
-                timerProgressBar: true,
-            });
-
             if (nodes.length === 0 || connections.length === 0) {
-                Toast.fire({
-                    icon: 'warning',
-                    title: 'Tidak ada node atau koneksi yang bisa disimpan!'
-                });
+                Swal.fire('Error', 'Tidak ada node atau koneksi yang bisa disimpan!', 'warning');
                 return;
             }
-
 
             const power = parseFloat(document.getElementById('input-power').value || 0);
 
@@ -891,16 +698,9 @@
                 const data = await response.json();
 
                 if (data.success) {
-                    Toast.fire({
-                        icon: 'success',
-                        title: data.message || 'Topologi berhasil disimpan!'
-                    });
+                    Swal.fire('Berhasil', data.message || 'Topologi berhasil disimpan!', 'success');
                 } else {
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Gagal',
-                        html: (data.errors || ['Gagal menyimpan topologi']).join('<br>')
-                    });
+                    Swal.fire('Gagal', (data.errors || ['Gagal menyimpan topologi']).join('<br>'), 'error');
                 }
             } catch (error) {
                 console.error(error);

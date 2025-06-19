@@ -12,7 +12,10 @@ class LabController extends Controller
      */
     public function index()
     {
-        $labs = Lab::paginate(10); // Ambil semua lab
+        $labs = Lab::when(request('search'), function ($query, $search) {
+            $query->where('name', 'like', "%$search%")
+                ->orWhere('author', 'like', "%$search%");
+        })->paginate(10);
 
         return view('lab.index', [
             'title' => 'Labs Collection',
@@ -49,7 +52,7 @@ class LabController extends Controller
         ]);
 
         // Redirect ke halaman topologi
-        return redirect()->route('lab.canvas', $lab->id)->with('success', 'Lab berhasil dibuat!');
+        return redirect()->route('lab.canvas', $lab->id)->with('success', 'Lab successfully created!');
     }
 
     /**
@@ -87,10 +90,7 @@ class LabController extends Controller
             'description' => $request->description,
         ]);
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Lab berhasil diperbarui!'
-        ]);
+        return redirect()->back()->with('success', 'Lab successfully updated!');
     }
 
     /**
@@ -100,7 +100,7 @@ class LabController extends Controller
         $lab = Lab::findOrFail($id);
         $lab->delete();
 
-        return redirect()->route('lab')->with('success', 'Lab berhasil dihapus!');
+        return redirect()->route('lab')->with('success', 'Lab successfully deleted!');
     }
 
     public function topologi(Lab $lab)

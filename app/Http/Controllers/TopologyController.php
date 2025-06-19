@@ -4,62 +4,86 @@ namespace App\Http\Controllers;
 
 use App\Models\Topology;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Validator;
 
 class TopologyController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
+    // public function save(Request $request)
+    // {
+    //     // Validasi manual agar bisa tampilkan semua error
+    //     $validator = Validator::make($request->all(), [
+    //         'nodes' => 'required|array',
+    //         'connections' => 'required|array',
+    //         'power' => 'required|numeric',
+    //     ]);
+
+    //     if ($validator->fails()) {
+    //         // Kirim semua error sebagai array untuk ditangani oleh SweetAlert di frontend
+    //         return response()->json([
+    //             'success' => false,
+    //             'errors' => $validator->errors()->all(),
+    //         ], 422);
+    //     }
+
+    //     try {
+    //         Topology::create([
+    //             'nodes' => json_encode($request->nodes),
+    //             'connections' => json_encode($request->connections),
+    //             'power' => $request->power,
+    //         ]);
+
+    //         return response()->json(['success' => true, 'message' => 'Topologi berhasil disimpan.']);
+    //     } catch (\Throwable $e) {
+    //         Log::error("Gagal simpan topologi: " . $e->getMessage());
+    //         return response()->json([
+    //             'success' => false,
+    //             'errors' => ['Terjadi kesalahan server: ' . $e->getMessage()],
+    //         ], 500);
+    //     }
+    // }
+
+    public function save(Request $request, $id)
     {
-        //
+        $data = $request->validate([
+            'nodes' => 'required|array',
+            'connections' => 'required|array',
+            'power' => 'nullable|numeric',
+            'nama' => 'nullable|string',
+            'deskripsi' => 'nullable|string',
+        ]);
+
+        // Simpan ke DB, update jika sudah ada
+        $topo = Topology::updateOrCreate(
+            ['lab_id' => $id],
+            [
+                'nodes' => json_encode($data['nodes']),
+                'connections' => json_encode($data['connections']),
+                'power' => $data['power'] ?? null,
+                'nama' => $data['nama'] ?? null,
+                'deskripsi' => $data['deskripsi'] ?? null,
+            ]
+        );
+
+        return response()->json(['success' => true, 'message' => 'Topologi berhasil disimpan']);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
+    public function load($lab_id)
     {
-        //
-    }
+        $topology = Topology::where('lab_id', $lab_id)->latest()->first();
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
-    {
-        //
-    }
+        if (!$topology) {
+            return response()->json([
+                'nodes' => [],
+                'connections' => [],
+            ]);
+        }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(Topology $topology)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Topology $topology)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, Topology $topology)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(Topology $topology)
-    {
-        //
+        return response()->json([
+            'nodes' => $topology->nodes,
+            'connections' => $topology->connections,
+            'power' => $topology->power,
+        ]);
     }
 }
