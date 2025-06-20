@@ -65,7 +65,7 @@
         <div class="col-md-6 position-relative" id="map-canvas"
             style="min-height: 500px; background-color: #f9f9f9; border: 1px solid #ccc;"></div>
 
-        {{-- <div class="col-md-3">
+        <!-- <div class="col-md-3">
         <h5>Informasi Loss</h5>
         <div id="info-card" class="card d-none">
             <div class="card-body">
@@ -75,7 +75,7 @@
                 <p class="card-text">Jalur: <span id="jalur-text">-</span></p>
             </div>
         </div>
-            </div> --}}
+            </div>  -->
         <div class="col-md-3">
             <div class="green-box">
                 <h5 class="text-black">Informasi Loss</h5>

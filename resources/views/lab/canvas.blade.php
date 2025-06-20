@@ -30,9 +30,10 @@
                 <button class="btn btn-sm btn-light text-dark fw-bold" onclick="addNode('Splitter')">
                     <i class="fas fa-code-branch me-1"></i> Splitter
                 </button>
-                {{-- <button class="btn btn-sm btn-outline-primary text-dark" onclick="addNode('ODP')">
+                <!-- d-none hidden -->
+                <button class="btn btn-sm btn-outline-primary text-dark d-none" onclick="addNode('ODP')">
                     <i class="fas fa-network-wired me-1"></i> ODP
-                </button> --}}
+                </button>
                 <button class="btn btn-sm btn-light text-dark fw-bold" onclick="addNode('Client')">
                     <i class="fas fa-user me-1"></i> Client
                 </button>
@@ -212,7 +213,7 @@
 
                 Toast.fire({
                     icon: 'success',
-                    title: '{{ session('success') }}'
+                    title: '{{ session('success') }}',
                 });
             });
         </script>
