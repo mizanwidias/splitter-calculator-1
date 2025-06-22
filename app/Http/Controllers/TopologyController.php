@@ -84,6 +84,6 @@ class TopologyController extends Controller
             'nodes' => $topology->nodes,
             'connections' => $topology->connections,
             'power' => $topology->power,
-        ]);
+        ]);        
     }
 }
