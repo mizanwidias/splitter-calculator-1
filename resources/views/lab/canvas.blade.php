@@ -224,18 +224,18 @@
             Swal.fire({
                 title: '🛠 Edit Informasi Lab',
                 html: `
-        <div class="text-start mb-2"><label class="form-label fw-bold">Nama Lab</label>
+        <div class="text-start mb-2"><label class="form-label fw-bold">Lab Name</label>
             <input id="lab-name" class="form-control" value="{{ $lab['name'] }}">
         </div>
         <div class="text-start mb-2"><label class="form-label fw-bold">Author</label>
             <input id="lab-author" class="form-control" value="{{ $lab['author'] }}">
         </div>
-        <div class="text-start mb-2"><label class="form-label fw-bold">Deskripsi</label>
+        <div class="text-start mb-2"><label class="form-label fw-bold">Description</label>
             <textarea id="lab-description" class="form-control" rows="3">{{ $lab['description'] }}</textarea>
         </div>
     `,
                 width: 600,
-                confirmButtonText: '💾 Simpan Perubahan',
+                confirmButtonText: '💾 Save Changes',
                 confirmButtonColor: '#10BC69',
                 cancelButtonText: 'Batal',
                 showCancelButton: true,
@@ -261,7 +261,7 @@
                     const description = document.getElementById('lab-description').value.trim();
 
                     if (!name || !author) {
-                        Swal.showValidationMessage('Nama dan Author tidak boleh kosong!');
+                        Swal.showValidationMessage('name dan Author tidak boleh kosong!');
                         return false;
                     }
 
@@ -361,20 +361,21 @@
                 new bootstrap.Modal(document.getElementById('splitterModal')).show();
                 return;
             }
+
             const el = document.createElement("div");
             el.classList.add("position-absolute", "p-2", "bg-white", "border", "rounded", "text-center");
             el.setAttribute("id", `node-${nodeId}`);
 
             const canvas = document.getElementById("map-canvas");
-            const canvasRect = canvas.getBoundingClientRect();
             const centerX = canvas.clientWidth / 2;
             const centerY = canvas.clientHeight / 2;
 
-            el.style.left = `${centerX - 50}px`; // sesuaikan offset jika ukuran node berbeda
+            el.style.left = `${centerX - 50}px`;
             el.style.top = `${centerY - 25}px`;
 
             let label = type;
             let loss = 0;
+            let power = "";
 
             if (type.startsWith('Splitter')) {
                 const splitRatio = type.split(' ')[1];
@@ -396,11 +397,18 @@
                 loss = odpType.toLowerCase() === 'besar' ? 0.5 : 0.2;
             }
 
-            el.innerHTML =
-                `<strong>${label}</strong><div class="output-power" style="font-size: 12px; color: green;"></div>`;
-            el.dataset.loss = loss;
-            el.dataset.power = "";
+            if (type === 'OLT') {
+                power = document.getElementById("input-power")?.value || 0;
+            }
 
+            el.dataset.loss = loss;
+            el.dataset.power = power;
+
+            const powerDisplay = power ? `${parseFloat(power).toFixed(2)} dB` : '';
+            el.innerHTML =
+                `<strong>${label}</strong><div class="output-power" style="font-size: 12px; color: green;">${powerDisplay}</div>`;
+
+            // Click to connect node
             el.addEventListener('click', function() {
                 const clickedEl = this;
 
@@ -411,15 +419,15 @@
                     Swal.fire({
                         title: 'Hubungkan Node',
                         html: `
-                <div class="text-start mb-2">Panjang Kabel (meter)</div>
-                <input id="swal-length" type="number" class="swal2-input" value="${document.getElementById("cable-length")?.value || 50}">
+                    <div class="text-start mb-2">Panjang Kabel (meter)</div>
+                    <input id="swal-length" type="number" class="swal2-input" value="${document.getElementById("cable-length")?.value || 50}">
 
-                <div class="text-start mb-2 mt-2">Jenis Kabel</div>
-                <select id="swal-cable" class="swal2-select">
-                    <option value="dropcore" selected>Dropcore (0.2 dB/km)</option>
-                    <option value="patchcord">Patchcord (0.3 dB/km)</option>
-                </select>
-            `,
+                    <div class="text-start mb-2 mt-2">Jenis Kabel</div>
+                    <select id="swal-cable" class="swal2-select">
+                        <option value="dropcore" selected>Dropcore (0.2 dB/km)</option>
+                        <option value="patchcord">Patchcord (0.3 dB/km)</option>
+                    </select>
+                `,
                         focusConfirm: false,
                         confirmButtonText: 'Hubungkan',
                         showCancelButton: true,
@@ -455,7 +463,6 @@
                                 window.selectedCableName = 'Patchcord';
                             }
 
-                            // ⬇️ INI YANG KRUSIAL: pakai clickedEl sebagai node tujuan
                             connectNodeElements(selectedNode, clickedEl, length);
                             selectedNode.classList.remove('border-primary');
                             selectedNode = null;
@@ -467,7 +474,6 @@
                 }
             });
 
-
             makeDraggable(el);
             document.getElementById("map-canvas").appendChild(el);
             nodeId++;
@@ -477,6 +483,7 @@
                 node: el
             });
         }
+
 
         function addLineContextMenu(lineObj) {
             const lineEl = lineObj.line;
@@ -535,7 +542,7 @@
                         color: 'red',
                         fontSize: '12px'
                     }),
-                    startLabel: window.selectedCableName
+                    // startLabel: window.selectedCableName
                 }
             );
 
@@ -543,6 +550,8 @@
                 from: source.id,
                 to: target.id,
                 cable: window.selectedCableName,
+                loss: lossCable, // ⬅️ SIMPAN loss kabel di sini!
+                length: length,
                 line
             });
 
@@ -805,11 +814,11 @@
                     dash: {
                         animation: true
                     },
-                    middleLabel: LeaderLine.pathLabel(`${conn.cable}`, {
+                    middleLabel: LeaderLine.pathLabel(`-${(conn.loss || 0).toFixed(2)} dB`, {
                         color: 'red',
                         fontSize: '12px'
-                    }),
-                    startLabel: conn.cable
+                    })
+                    // startLabel: conn.cable
                 }
             );
 
@@ -818,7 +827,7 @@
                 to: target.id,
                 cable: window.selectedCableName,
                 loss: lossCable, // ⬅️ simpan loss
-                panjang: length, // ⬅️ simpan panjang
+                length: length, // ⬅️ simpan length
                 line
             });
 
@@ -883,8 +892,8 @@
                         nodes,
                         connections,
                         power,
-                        nama: "{{ $lab['nama'] ?? '' }}",
-                        deskripsi: "{{ $lab['deskripsi'] ?? '' }}"
+                        name: "{{ $lab['name'] ?? '' }}",
+                        description: "{{ $lab['description'] ?? '' }}"
                     })
                 });
 
@@ -893,18 +902,18 @@
                 if (data.success) {
                     Toast.fire({
                         icon: 'success',
-                        title: data.message || 'Topologi berhasil disimpan!'
+                        title: data.message || 'Topology successfully saved!'
                     });
                 } else {
                     Swal.fire({
                         icon: 'error',
-                        title: 'Gagal',
-                        html: (data.errors || ['Gagal menyimpan topologi']).join('<br>')
+                        title: 'Failed',
+                        html: (data.errors || ['Failed to save topology']).join('<br>')
                     });
                 }
             } catch (error) {
                 console.error(error);
-                Swal.fire('Gagal', 'Terjadi kesalahan saat menyimpan.', 'error');
+                Swal.fire('Gagal', 'Happened an error.', 'error');
             }
         }
 
@@ -932,8 +941,8 @@
                     from: conn.from,
                     to: conn.to,
                     cable: conn.cable,
-                    loss: conn.loss, // ⬅️ simpan
-                    panjang: conn.panjang // ⬅️ simpan
+                    loss: conn.loss, // ⬅️ wajib untuk label di tengah kabel
+                    length: conn.length
                 });
             });
 
@@ -946,8 +955,8 @@
                 nodes: [],
                 connections: [],
                 power: parseFloat(document.getElementById('input-power').value || 0),
-                nama: "{{ $lab['nama'] }}",
-                deskripsi: "{{ $lab['deskripsi'] }}"
+                name: "{{ $lab['name'] }}",
+                description: "{{ $lab['description'] }}"
             };
 
             document.querySelectorAll("#map-canvas > div").forEach(node => {
@@ -968,14 +977,14 @@
                     cable: conn.cable,
                     color: conn.line?.options?.color || 'black',
                     loss: conn.loss,
-                    panjang: conn.panjang
+                    length: conn.length
                 });
             });
 
             const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(topology, null, 2));
             const dlAnchor = document.createElement('a');
             dlAnchor.setAttribute("href", dataStr);
-            dlAnchor.setAttribute("download", `topologi-${topology.nama.replace(/\s+/g, '_')}.json`);
+            dlAnchor.setAttribute("download", `topologi-${topology.name.replace(/\s+/g, '_')}.json`);
             document.body.appendChild(dlAnchor);
             dlAnchor.click();
             dlAnchor.remove();

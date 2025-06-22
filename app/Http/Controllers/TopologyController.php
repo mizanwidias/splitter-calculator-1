@@ -50,8 +50,8 @@ class TopologyController extends Controller
             'nodes' => 'required|array',
             'connections' => 'required|array',
             'power' => 'nullable|numeric',
-            'nama' => 'nullable|string',
-            'deskripsi' => 'nullable|string',
+            'name' => 'nullable|string',
+            'description' => 'nullable|string',
         ]);
 
         // Simpan ke DB, update jika sudah ada
@@ -61,12 +61,12 @@ class TopologyController extends Controller
                 'nodes' => json_encode($data['nodes']),
                 'connections' => json_encode($data['connections']),
                 'power' => $data['power'] ?? null,
-                'nama' => $data['nama'] ?? null,
-                'deskripsi' => $data['deskripsi'] ?? null,
+                'name' => $data['name'] ?? null,
+                'description' => $data['description'] ?? null,
             ]
         );
 
-        return response()->json(['success' => true, 'message' => 'Topologi berhasil disimpan']);
+        return response()->json(['success' => true, 'message' => 'Topology saved successfully.']);
     }
 
     public function load($lab_id)
@@ -81,8 +81,8 @@ class TopologyController extends Controller
         }
 
         return response()->json([
-            'nodes' => $topology->nodes,
-            'connections' => $topology->connections,
+            'nodes' => json_decode($topology->nodes, true),
+            'connections' => json_decode($topology->connections, true),
             'power' => $topology->power,
         ]);
     }
