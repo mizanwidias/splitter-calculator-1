@@ -111,7 +111,7 @@
         </div>
     </div>
     <!-- Canvas Full Area -->
-    <div id="map-canvas" data-lab-id="{{ $lab['id'] }}" style="position: relative; height: 100vh;">
+    <div id="map-canvas" data-lab-id="{{ $lab['id'] }}" style="position: relative; height: 100vh; ">
     </div>
 
     {{-- <!-- Jadi style baru: -->
@@ -339,6 +339,8 @@
                 // Set posisi aman
                 el.style.left = `${newLeft}px`;
                 el.style.top = `${newTop}px`;
+                el.dataset.left = el.style.left;
+                el.dataset.top = el.style.top;
 
                 // Update garis
                 lines.forEach(link => {
@@ -352,6 +354,9 @@
                 isDragging = false;
                 document.removeEventListener('mousemove', onMouseMove);
                 document.removeEventListener('mouseup', onMouseUp);
+
+                // Tambahkan ini:
+                LeaderLine.positionAll();
             }
         }
 
@@ -482,6 +487,7 @@
                 type: "add-node",
                 node: el
             });
+            isTopologyChanged = true;
         }
 
 
@@ -575,6 +581,7 @@
                 from: source.id,
                 to: target.id
             });
+            isTopologyChanged = true;
         }
 
 
@@ -593,7 +600,6 @@
 
             if (last.type === "add-node") {
                 const node = last.node;
-                // Hapus kabel yang terhubung ke node
                 lines = lines.filter(conn => {
                     if (conn.from === node.id || conn.to === node.id) {
                         conn.line.remove();
@@ -604,24 +610,56 @@
                 node.remove();
             }
 
-            // Reset tampilan info
+            if (last.type === 'reset') {
+                // Bersihkan sebelum kembalikan node/kabel
+                document.getElementById("map-canvas").innerHTML = '';
+                lines.forEach(link => link.line.remove());
+                lines = [];
+
+                last.nodes.forEach(addNodeFromDB);
+                last.connections.forEach(drawConnectionFromDB);
+                calculateAllLoss();
+            }
+
             document.getElementById("info-card").classList.add("d-none");
+            isTopologyChanged = true;
         }
 
+
         function resetMap() {
-            // Hapus semua garis
+            actions.push({
+                type: 'reset',
+                nodes: Array.from(document.querySelectorAll("#map-canvas > div")).map(el => ({
+                    id: el.id,
+                    type: el.querySelector('strong')?.innerText || '',
+                    loss: parseFloat(el.dataset.loss || 0),
+                    power: parseFloat(el.dataset.power || 0),
+                    top: el.style.top,
+                    left: el.style.left
+                })),
+                connections: lines.map(link => ({
+                    from: link.from,
+                    to: link.to,
+                    cable: link.cable,
+                    loss: link.loss,
+                    length: link.length
+                }))
+            });
+            // ⛔️ Ini yang kurang sebelumnya:
             lines.forEach(link => link.line.remove());
             lines = [];
 
-            // Hapus semua node
+            // Hapus semua node dari canvas
             const canvas = document.getElementById("map-canvas");
             canvas.innerHTML = '';
 
-            // Reset node ID
+            // Reset variabel
             nodeId = 0;
             selectedNode = null;
+            // actions = [];
+            connections = [];
 
-            // Sembunyikan info
+            // Sembunyikan info panel
             document.getElementById("info-card").classList.add("d-none");
         }
 
@@ -644,17 +682,41 @@
                 });
 
                 if (result.isConfirmed) {
+                    actions.push({
+                        type: 'reset',
+                        nodes: Array.from(document.querySelectorAll("#map-canvas > div")).map(el => ({
+                            id: el.id,
+                            type: el.querySelector('strong')?.innerText || '',
+                            loss: parseFloat(el.dataset.loss || 0),
+                            power: parseFloat(el.dataset.power || 0),
+                            top: el.style.top,
+                            left: el.style.left
+                        })),
+                        connections: lines.map(link => ({
+                            from: link.from,
+                            to: link.to,
+                            cable: link.cable,
+                            loss: link.loss,
+                            length: link.length
+                        }))
+                    });
+                    // ⛔️ Ini yang kurang sebelumnya:
                     lines.forEach(link => link.line.remove());
                     lines = [];
 
+                    // Hapus semua node dari canvas
                     const canvas = document.getElementById("map-canvas");
                     canvas.innerHTML = '';
 
+                    // Reset variabel
                     nodeId = 0;
                     selectedNode = null;
+                    // actions = [];
+                    connections = [];
 
+                    // Sembunyikan info panel
                     document.getElementById("info-card").classList.add("d-none");
-
+                    isTopologyChanged = true;
                     Toast.fire({
                         icon: 'success',
                         title: 'Topologi berhasil direset!'
@@ -789,6 +851,8 @@
 
             makeDraggable(el);
             document.getElementById("map-canvas").appendChild(el);
+            isTopologyChanged = true;
+
         }
 
         function drawConnectionFromDB(conn) {
@@ -823,11 +887,11 @@
             );
 
             lines.push({
-                from: source.id,
-                to: target.id,
-                cable: window.selectedCableName,
-                loss: lossCable, // ⬅️ simpan loss
-                length: length, // ⬅️ simpan length
+                from: fromEl.id,
+                to: toEl.id,
+                cable: conn.cable,
+                loss: conn.loss,
+                length: conn.length,
                 line
             });
 
@@ -837,6 +901,7 @@
                 cable: conn.cable,
                 line
             });
+            isTopologyChanged = true;
         }
 
         function calculateAllLoss() {
@@ -915,6 +980,7 @@
                 console.error(error);
                 Swal.fire('Gagal', 'Happened an error.', 'error');
             }
+            isTopologyChanged = false;
         }
 
         function gatherAndSaveTopology() {
@@ -948,6 +1014,7 @@
 
             const labId = document.getElementById('map-canvas').dataset.labId;
             saveTopology(topology, labId);
+            isTopologyChanged = false;
         }
 
         function exportTopology() {
@@ -988,6 +1055,7 @@
             document.body.appendChild(dlAnchor);
             dlAnchor.click();
             dlAnchor.remove();
+            isTopologyChanged = false;
         }
 
         function importTopology(file) {
@@ -1031,5 +1099,10 @@
                 return "Perubahan Anda belum disimpan. Yakin ingin keluar?";
             }
         };
+
+        document.getElementById('map-canvas').addEventListener('scroll', LeaderLine.positionAll);
+        // Biar kabel gak geser saat scroll atau resize
+        window.addEventListener('scroll', LeaderLine.positionAll);
+        window.addEventListener('resize', LeaderLine.positionAll);
     </script>
 @endpush
