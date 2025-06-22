@@ -81,8 +81,8 @@ class TopologyController extends Controller
         }
 
         return response()->json([
-            'nodes' => json_decode($topology->nodes, true),
-            'connections' => json_decode($topology->connections, true),
+            'nodes' => $topology->nodes,
+            'connections' => $topology->connections,
             'power' => $topology->power,
         ]);
     }
