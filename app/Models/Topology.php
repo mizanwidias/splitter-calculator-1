@@ -15,6 +15,7 @@ class Topology extends Model
         'description',
         'nodes',
         'connections',
+        'power'
     ];
 
     protected $casts = [
@@ -23,7 +24,7 @@ class Topology extends Model
     ];
 
     // Topology.php
-    public function nodes()
+    public function nodeItems()
     {
         return $this->hasMany(Node::class);
     }
