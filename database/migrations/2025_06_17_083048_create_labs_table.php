@@ -13,7 +13,18 @@ return new class extends Migration
     {
         Schema::create('labs', function (Blueprint $table) {
             $table->id();
-            $table->string('name');
+
+            $table->unsignedBigInteger('lab_group_id')->nullable();
+            $table->foreign('lab_group_id')
+                ->references('id')
+                ->on('lab_groups')
+                ->onDelete('set null');
+
+            $table->string('name');              // Nama lab
+            $table->string('slug');              // Slug lab (wajib buat nama file JSON unik per folder)
+
+            $table->unique(['lab_group_id', 'slug']); // ✅ Slug unik per folder
+
             $table->string('author')->nullable();
             $table->text('description')->nullable();
             $table->timestamps();

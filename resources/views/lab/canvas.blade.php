@@ -665,13 +665,13 @@
 
         function resetTopology() {
             Swal.fire({
-                title: 'Yakin ingin mereset?',
-                text: 'Semua node dan koneksi akan dihapus!',
+                title: 'Are you sure you want to reset?',
+                text: 'All nodes and connections will be deleted!',
                 icon: 'warning',
                 showCancelButton: true,
-                confirmButtonText: 'Ya, reset!',
+                confirmButtonText: 'Yes, reset!',
                 confirmButtonColor: 'red',
-                cancelButtonText: 'Batal',
+                cancelButtonText: 'Cancel',
             }).then((result) => {
                 const Toast = Swal.mixin({
                     toast: true,
@@ -936,7 +936,7 @@
             if (nodes.length === 0 || connections.length === 0) {
                 Toast.fire({
                     icon: 'warning',
-                    title: 'Tidak ada node atau koneksi yang bisa disimpan!'
+                    title: 'There are no nodes or connections to save!'
                 });
                 return;
             }
@@ -954,28 +954,16 @@
                             'content')
                     },
                     body: JSON.stringify({
+                        name: "{{ $lab['name'] ?? '' }}",
+                        author: "{{ $lab['author'] ?? '' }}",
+                        description: "{{ $lab['description'] ?? '' }}",
                         nodes,
                         connections,
                         power,
-                        name: "{{ $lab['name'] ?? '' }}",
-                        description: "{{ $lab['description'] ?? '' }}"
                     })
                 });
 
                 const data = await response.json();
-
-                if (data.success) {
-                    Toast.fire({
-                        icon: 'success',
-                        title: data.message || 'Topology successfully saved!'
-                    });
-                } else {
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Failed',
-                        html: (data.errors || ['Failed to save topology']).join('<br>')
-                    });
-                }
             } catch (error) {
                 console.error(error);
                 Swal.fire('Gagal', 'Happened an error.', 'error');
@@ -986,7 +974,11 @@
         function gatherAndSaveTopology() {
             const topology = {
                 nodes: [],
-                connections: []
+                connections: [],
+                power: parseFloat(document.getElementById('input-power')?.value || 0),
+                name: "{{ $lab['name'] ?? '' }}",
+                author: "{{ $lab['author'] ?? '' }}",
+                description: "{{ $lab['description'] ?? '' }}"
             };
 
             const nodeElements = Array.from(document.querySelectorAll("#map-canvas > div"));
@@ -998,7 +990,7 @@
                     loss: parseFloat(node.dataset.loss || 0),
                     power: parseFloat(node.dataset.power || 0),
                     top: node.style.top,
-                    left: node.style.left,
+                    left: node.style.left
                 });
             });
 
@@ -1007,15 +999,53 @@
                     from: conn.from,
                     to: conn.to,
                     cable: conn.cable,
-                    loss: conn.loss, // ⬅️ wajib untuk label di tengah kabel
+                    color: conn.line?.options?.color || 'black',
+                    loss: conn.loss,
                     length: conn.length
                 });
             });
 
             const labId = document.getElementById('map-canvas').dataset.labId;
+
+            // ⛔ Skip semuanya kalau kosong
+            if (topology.nodes.length === 0 || topology.connections.length === 0) {
+                saveTopology(topology, labId); // tetap panggil ini karena dia yang munculin warning Swal
+                return;
+            }
+
+            // ✅ Simpan ke database
             saveTopology(topology, labId);
-            isTopologyChanged = false;
+
+            // ✅ Simpan ke file local.json di server
+            fetch(`/lab/${labId}/update-json`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                    },
+                    body: JSON.stringify(topology)
+                })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        Swal.fire({
+                            toast: true,
+                            position: 'top-end',
+                            icon: 'success',
+                            title: 'The topology is saved into a lab file!',
+                            showConfirmButton: false,
+                            timer: 1500
+                        });
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Failed to save lab file',
+                            text: 'Please try again in a moment.'
+                        });
+                    }
+                })
         }
+
 
         function exportTopology() {
             const topology = {
@@ -1023,6 +1053,7 @@
                 connections: [],
                 power: parseFloat(document.getElementById('input-power').value || 0),
                 name: "{{ $lab['name'] }}",
+                author: "{{ $lab['author'] }}",
                 description: "{{ $lab['description'] }}"
             };
 

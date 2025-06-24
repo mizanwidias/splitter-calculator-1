@@ -138,3 +138,11 @@ input[type=range]::-moz-range-thumb {
   border: 2px solid white;
   cursor: pointer;
 }
+
+.dropdown-menu .dropdown-item:hover {
+    background-color: #f0f0f0;
+    font-weight: bold;
+    color: #198754; /* hijau Bootstrap */
+    transition: background-color 0.2s ease;
+}
+

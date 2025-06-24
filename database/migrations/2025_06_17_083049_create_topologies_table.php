@@ -10,10 +10,14 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('topologies', function (Blueprint $table) {
-            $table->id(); // cukup satu kali, ini sudah membuat kolom id bigint unsigned auto_increment
-            $table->foreignId('lab_id')->constrained('labs')->onDelete('cascade');
+            $table->id();
+            $table->foreignId('lab_id')->constrained('labs')->onDelete('cascade'); // FK
             $table->string('name')->default('Topologi Default');
             $table->boolean('is_autosaved')->default(false);
+            $table->json('nodes')->nullable();
+            $table->json('connections')->nullable();
+            $table->float('power')->nullable();
+            $table->text('description')->nullable();
             $table->timestamps();
         });
     }
