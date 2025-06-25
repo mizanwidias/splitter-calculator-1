@@ -7,5 +7,10 @@ use Illuminate\Database\Eloquent\Model;
 class Lab extends Model
 {
     protected $table = 'labs';
-    protected $fillable = ['name', 'author', 'description'];
+    protected $fillable = ['name', 'slug', 'author', 'description', 'lab_group_id'];
+
+    public function group()
+    {
+        return $this->belongsTo(LabGroup::class, 'lab_group_id');
+    }
 }

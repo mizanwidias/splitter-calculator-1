@@ -12,6 +12,20 @@
         <div class="container">
             <div class="row">
                 <form method="POST" action="{{ route('lab.store') }}" enctype="multipart/form-data">
+
+                    @if ($breadcrumbs ?? false)
+                        <div class="mb-4">
+                            <strong>📂 Folder:</strong>
+                            <span>
+                                root
+                                @foreach ($breadcrumbs as $b)
+                                    / {{ $b['name'] }}
+                                @endforeach
+                            </span>
+                        </div>
+                        <input type="hidden" name="lab_group_id" value="{{ $selectedGroup }}">
+                    @endif
+
                     @csrf
                     <div class="mb-4">
                         <label for="name" class="form-label">Lab Name</label>

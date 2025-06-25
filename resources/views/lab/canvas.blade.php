@@ -112,7 +112,7 @@
         </div>
     </div>
     <!-- Canvas Full Area -->
-    <div id="map-canvas" data-lab-id="{{ $lab['id'] }}" style="position: relative; height: 100vh;">
+    <div id="map-canvas" data-lab-id="{{ $lab['id'] }}" style="position: relative; height: 100vh; ">
     </div>
 
     {{-- <!-- Jadi style baru: -->
@@ -225,18 +225,18 @@
             Swal.fire({
                 title: '🛠 Edit Informasi Lab',
                 html: `
-        <div class="text-start mb-2"><label class="form-label fw-bold">Nama Lab</label>
+        <div class="text-start mb-2"><label class="form-label fw-bold">Lab Name</label>
             <input id="lab-name" class="form-control" value="{{ $lab['name'] }}">
         </div>
         <div class="text-start mb-2"><label class="form-label fw-bold">Author</label>
             <input id="lab-author" class="form-control" value="{{ $lab['author'] }}">
         </div>
-        <div class="text-start mb-2"><label class="form-label fw-bold">Deskripsi</label>
+        <div class="text-start mb-2"><label class="form-label fw-bold">Description</label>
             <textarea id="lab-description" class="form-control" rows="3">{{ $lab['description'] }}</textarea>
         </div>
     `,
                 width: 600,
-                confirmButtonText: '💾 Simpan Perubahan',
+                confirmButtonText: '💾 Save Changes',
                 confirmButtonColor: '#10BC69',
                 cancelButtonText: 'Batal',
                 showCancelButton: true,
@@ -262,7 +262,7 @@
                     const description = document.getElementById('lab-description').value.trim();
 
                     if (!name || !author) {
-                        Swal.showValidationMessage('Nama dan Author tidak boleh kosong!');
+                        Swal.showValidationMessage('name dan Author tidak boleh kosong!');
                         return false;
                     }
 
@@ -340,6 +340,8 @@
                 // Set posisi aman
                 el.style.left = `${newLeft}px`;
                 el.style.top = `${newTop}px`;
+                el.dataset.left = el.style.left;
+                el.dataset.top = el.style.top;
 
                 // Update garis
                 lines.forEach(link => {
@@ -353,6 +355,9 @@
                 isDragging = false;
                 document.removeEventListener('mousemove', onMouseMove);
                 document.removeEventListener('mouseup', onMouseUp);
+
+                // Tambahkan ini:
+                LeaderLine.positionAll();
             }
         }
 
@@ -362,20 +367,21 @@
                 new bootstrap.Modal(document.getElementById('splitterModal')).show();
                 return;
             }
+
             const el = document.createElement("div");
             el.classList.add("position-absolute", "p-2", "bg-white", "border", "rounded", "text-center");
             el.setAttribute("id", `node-${nodeId}`);
 
             const canvas = document.getElementById("map-canvas");
-            const canvasRect = canvas.getBoundingClientRect();
             const centerX = canvas.clientWidth / 2;
             const centerY = canvas.clientHeight / 2;
 
-            el.style.left = `${centerX - 50}px`; // sesuaikan offset jika ukuran node berbeda
+            el.style.left = `${centerX - 50}px`;
             el.style.top = `${centerY - 25}px`;
 
             let label = type;
             let loss = 0;
+            let power = "";
 
             if (type.startsWith('Splitter')) {
                 const splitRatio = type.split(' ')[1];
@@ -397,11 +403,18 @@
                 loss = odpType.toLowerCase() === 'besar' ? 0.5 : 0.2;
             }
 
-            el.innerHTML =
-                `<strong>${label}</strong><div class="output-power" style="font-size: 12px; color: green;"></div>`;
-            el.dataset.loss = loss;
-            el.dataset.power = "";
+            if (type === 'OLT') {
+                power = document.getElementById("input-power")?.value || 0;
+            }
 
+            el.dataset.loss = loss;
+            el.dataset.power = power;
+
+            const powerDisplay = power ? `${parseFloat(power).toFixed(2)} dB` : '';
+            el.innerHTML =
+                `<strong>${label}</strong><div class="output-power" style="font-size: 12px; color: green;">${powerDisplay}</div>`;
+
+            // Click to connect node
             el.addEventListener('click', function() {
                 const clickedEl = this;
 
@@ -412,15 +425,15 @@
                     Swal.fire({
                         title: 'Hubungkan Node',
                         html: `
-                <div class="text-start mb-2">Panjang Kabel (meter)</div>
-                <input id="swal-length" type="number" class="swal2-input" value="${document.getElementById("cable-length")?.value || 50}">
+                    <div class="text-start mb-2">Panjang Kabel (meter)</div>
+                    <input id="swal-length" type="number" class="swal2-input" value="${document.getElementById("cable-length")?.value || 50}">
 
-                <div class="text-start mb-2 mt-2">Jenis Kabel</div>
-                <select id="swal-cable" class="swal2-select">
-                    <option value="dropcore" selected>Dropcore (0.2 dB/km)</option>
-                    <option value="patchcord">Patchcord (0.3 dB/km)</option>
-                </select>
-            `,
+                    <div class="text-start mb-2 mt-2">Jenis Kabel</div>
+                    <select id="swal-cable" class="swal2-select">
+                        <option value="dropcore" selected>Dropcore (0.2 dB/km)</option>
+                        <option value="patchcord">Patchcord (0.3 dB/km)</option>
+                    </select>
+                `,
                         focusConfirm: false,
                         confirmButtonText: 'Hubungkan',
                         showCancelButton: true,
@@ -456,7 +469,6 @@
                                 window.selectedCableName = 'Patchcord';
                             }
 
-                            // ⬇️ INI YANG KRUSIAL: pakai clickedEl sebagai node tujuan
                             connectNodeElements(selectedNode, clickedEl, length);
                             selectedNode.classList.remove('border-primary');
                             selectedNode = null;
@@ -468,7 +480,6 @@
                 }
             });
 
-
             makeDraggable(el);
             document.getElementById("map-canvas").appendChild(el);
             nodeId++;
@@ -477,7 +488,9 @@
                 type: "add-node",
                 node: el
             });
+            isTopologyChanged = true;
         }
+
 
         function addLineContextMenu(lineObj) {
             const lineEl = lineObj.line;
@@ -536,7 +549,7 @@
                         color: 'red',
                         fontSize: '12px'
                     }),
-                    startLabel: window.selectedCableName
+                    // startLabel: window.selectedCableName
                 }
             );
 
@@ -544,6 +557,8 @@
                 from: source.id,
                 to: target.id,
                 cable: window.selectedCableName,
+                loss: lossCable, // ⬅️ SIMPAN loss kabel di sini!
+                length: length,
                 line
             });
 
@@ -567,6 +582,7 @@
                 from: source.id,
                 to: target.id
             });
+            isTopologyChanged = true;
         }
 
 
@@ -585,7 +601,6 @@
 
             if (last.type === "add-node") {
                 const node = last.node;
-                // Hapus kabel yang terhubung ke node
                 lines = lines.filter(conn => {
                     if (conn.from === node.id || conn.to === node.id) {
                         conn.line.remove();
@@ -596,36 +611,68 @@
                 node.remove();
             }
 
-            // Reset tampilan info
+            if (last.type === 'reset') {
+                // Bersihkan sebelum kembalikan node/kabel
+                document.getElementById("map-canvas").innerHTML = '';
+                lines.forEach(link => link.line.remove());
+                lines = [];
+
+                last.nodes.forEach(addNodeFromDB);
+                last.connections.forEach(drawConnectionFromDB);
+                calculateAllLoss();
+            }
+
             document.getElementById("info-card").classList.add("d-none");
+            isTopologyChanged = true;
         }
 
+
         function resetMap() {
-            // Hapus semua garis
+            actions.push({
+                type: 'reset',
+                nodes: Array.from(document.querySelectorAll("#map-canvas > div")).map(el => ({
+                    id: el.id,
+                    type: el.querySelector('strong')?.innerText || '',
+                    loss: parseFloat(el.dataset.loss || 0),
+                    power: parseFloat(el.dataset.power || 0),
+                    top: el.style.top,
+                    left: el.style.left
+                })),
+                connections: lines.map(link => ({
+                    from: link.from,
+                    to: link.to,
+                    cable: link.cable,
+                    loss: link.loss,
+                    length: link.length
+                }))
+            });
+            // ⛔️ Ini yang kurang sebelumnya:
             lines.forEach(link => link.line.remove());
             lines = [];
 
-            // Hapus semua node
+            // Hapus semua node dari canvas
             const canvas = document.getElementById("map-canvas");
             canvas.innerHTML = '';
 
-            // Reset node ID
+            // Reset variabel
             nodeId = 0;
             selectedNode = null;
+            // actions = [];
+            connections = [];
 
-            // Sembunyikan info
+            // Sembunyikan info panel
             document.getElementById("info-card").classList.add("d-none");
         }
 
         function resetTopology() {
             Swal.fire({
-                title: 'Yakin ingin mereset?',
-                text: 'Semua node dan koneksi akan dihapus!',
+                title: 'Are you sure you want to reset?',
+                text: 'All nodes and connections will be deleted!',
                 icon: 'warning',
                 showCancelButton: true,
-                confirmButtonText: 'Ya, reset!',
+                confirmButtonText: 'Yes, reset!',
                 confirmButtonColor: 'red',
-                cancelButtonText: 'Batal',
+                cancelButtonText: 'Cancel',
             }).then((result) => {
                 const Toast = Swal.mixin({
                     toast: true,
@@ -636,17 +683,41 @@
                 });
 
                 if (result.isConfirmed) {
+                    actions.push({
+                        type: 'reset',
+                        nodes: Array.from(document.querySelectorAll("#map-canvas > div")).map(el => ({
+                            id: el.id,
+                            type: el.querySelector('strong')?.innerText || '',
+                            loss: parseFloat(el.dataset.loss || 0),
+                            power: parseFloat(el.dataset.power || 0),
+                            top: el.style.top,
+                            left: el.style.left
+                        })),
+                        connections: lines.map(link => ({
+                            from: link.from,
+                            to: link.to,
+                            cable: link.cable,
+                            loss: link.loss,
+                            length: link.length
+                        }))
+                    });
+                    // ⛔️ Ini yang kurang sebelumnya:
                     lines.forEach(link => link.line.remove());
                     lines = [];
 
+                    // Hapus semua node dari canvas
                     const canvas = document.getElementById("map-canvas");
                     canvas.innerHTML = '';
 
+                    // Reset variabel
                     nodeId = 0;
                     selectedNode = null;
+                    // actions = [];
+                    connections = [];
 
+                    // Sembunyikan info panel
                     document.getElementById("info-card").classList.add("d-none");
-
+                    isTopologyChanged = true;
                     Toast.fire({
                         icon: 'success',
                         title: 'Topologi berhasil direset!'
@@ -781,6 +852,8 @@
 
             makeDraggable(el);
             document.getElementById("map-canvas").appendChild(el);
+            isTopologyChanged = true;
+
         }
 
         function drawConnectionFromDB(conn) {
@@ -806,20 +879,20 @@
                     dash: {
                         animation: true
                     },
-                    middleLabel: LeaderLine.pathLabel(`${conn.cable}`, {
+                    middleLabel: LeaderLine.pathLabel(`-${(conn.loss || 0).toFixed(2)} dB`, {
                         color: 'red',
                         fontSize: '12px'
-                    }),
-                    startLabel: conn.cable
+                    })
+                    // startLabel: conn.cable
                 }
             );
 
             lines.push({
-                from: source.id,
-                to: target.id,
-                cable: window.selectedCableName,
-                loss: lossCable, // ⬅️ simpan loss
-                panjang: length, // ⬅️ simpan panjang
+                from: fromEl.id,
+                to: toEl.id,
+                cable: conn.cable,
+                loss: conn.loss,
+                length: conn.length,
                 line
             });
 
@@ -829,6 +902,7 @@
                 cable: conn.cable,
                 line
             });
+            isTopologyChanged = true;
         }
 
         function calculateAllLoss() {
@@ -863,7 +937,7 @@
             if (nodes.length === 0 || connections.length === 0) {
                 Toast.fire({
                     icon: 'warning',
-                    title: 'Tidak ada node atau koneksi yang bisa disimpan!'
+                    title: 'There are no nodes or connections to save!'
                 });
                 return;
             }
@@ -881,38 +955,31 @@
                             'content')
                     },
                     body: JSON.stringify({
+                        name: "{{ $lab['name'] ?? '' }}",
+                        author: "{{ $lab['author'] ?? '' }}",
+                        description: "{{ $lab['description'] ?? '' }}",
                         nodes,
                         connections,
                         power,
-                        nama: "{{ $lab['nama'] ?? '' }}",
-                        deskripsi: "{{ $lab['deskripsi'] ?? '' }}"
                     })
                 });
 
                 const data = await response.json();
-
-                if (data.success) {
-                    Toast.fire({
-                        icon: 'success',
-                        title: data.message || 'Topologi berhasil disimpan!'
-                    });
-                } else {
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Gagal',
-                        html: (data.errors || ['Gagal menyimpan topologi']).join('<br>')
-                    });
-                }
             } catch (error) {
                 console.error(error);
-                Swal.fire('Gagal', 'Terjadi kesalahan saat menyimpan.', 'error');
+                Swal.fire('Gagal', 'Happened an error.', 'error');
             }
+            isTopologyChanged = false;
         }
 
         function gatherAndSaveTopology() {
             const topology = {
                 nodes: [],
-                connections: []
+                connections: [],
+                power: parseFloat(document.getElementById('input-power')?.value || 0),
+                name: "{{ $lab['name'] ?? '' }}",
+                author: "{{ $lab['author'] ?? '' }}",
+                description: "{{ $lab['description'] ?? '' }}"
             };
 
             const nodeElements = Array.from(document.querySelectorAll("#map-canvas > div"));
@@ -924,7 +991,7 @@
                     loss: parseFloat(node.dataset.loss || 0),
                     power: parseFloat(node.dataset.power || 0),
                     top: node.style.top,
-                    left: node.style.left,
+                    left: node.style.left
                 });
             });
 
@@ -933,22 +1000,62 @@
                     from: conn.from,
                     to: conn.to,
                     cable: conn.cable,
-                    loss: conn.loss, // ⬅️ simpan
-                    panjang: conn.panjang // ⬅️ simpan
+                    color: conn.line?.options?.color || 'black',
+                    loss: conn.loss,
+                    length: conn.length
                 });
             });
 
             const labId = document.getElementById('map-canvas').dataset.labId;
+
+            // ⛔ Skip semuanya kalau kosong
+            if (topology.nodes.length === 0 || topology.connections.length === 0) {
+                saveTopology(topology, labId); // tetap panggil ini karena dia yang munculin warning Swal
+                return;
+            }
+
+            // ✅ Simpan ke database
             saveTopology(topology, labId);
+
+            // ✅ Simpan ke file local.json di server
+            fetch(`/lab/${labId}/update-json`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                    },
+                    body: JSON.stringify(topology)
+                })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        Swal.fire({
+                            toast: true,
+                            position: 'top-end',
+                            icon: 'success',
+                            title: 'The topology is saved into a lab file!',
+                            showConfirmButton: false,
+                            timer: 1500
+                        });
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Failed to save lab file',
+                            text: 'Please try again in a moment.'
+                        });
+                    }
+                })
         }
+
 
         function exportTopology() {
             const topology = {
                 nodes: [],
                 connections: [],
                 power: parseFloat(document.getElementById('input-power').value || 0),
-                nama: "{{ $lab['nama'] }}",
-                deskripsi: "{{ $lab['deskripsi'] }}"
+                name: "{{ $lab['name'] }}",
+                author: "{{ $lab['author'] }}",
+                description: "{{ $lab['description'] }}"
             };
 
             document.querySelectorAll("#map-canvas > div").forEach(node => {
@@ -969,17 +1076,18 @@
                     cable: conn.cable,
                     color: conn.line?.options?.color || 'black',
                     loss: conn.loss,
-                    panjang: conn.panjang
+                    length: conn.length
                 });
             });
 
             const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(topology, null, 2));
             const dlAnchor = document.createElement('a');
             dlAnchor.setAttribute("href", dataStr);
-            dlAnchor.setAttribute("download", `topologi-${topology.nama.replace(/\s+/g, '_')}.json`);
+            dlAnchor.setAttribute("download", `topologi-${topology.name.replace(/\s+/g, '_')}.json`);
             document.body.appendChild(dlAnchor);
             dlAnchor.click();
             dlAnchor.remove();
+            isTopologyChanged = false;
         }
 
         function importTopology(file) {
@@ -1023,5 +1131,10 @@
                 return "Perubahan Anda belum disimpan. Yakin ingin keluar?";
             }
         };
+
+        document.getElementById('map-canvas').addEventListener('scroll', LeaderLine.positionAll);
+        // Biar kabel gak geser saat scroll atau resize
+        window.addEventListener('scroll', LeaderLine.positionAll);
+        window.addEventListener('resize', LeaderLine.positionAll);
     </script>
 @endpush
